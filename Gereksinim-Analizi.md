@@ -144,9 +144,9 @@
 **API Metodu:** DELETE
 **Açıklama:** Kullanıcının geçmiş aylara ait, geçerliliğini yitirmiş veya artık görmek istemediği eski yapay zeka performans raporlarını kendi listesinden silmesini sağlar.
 
-37. Bildirim Silme [(Mustafa İsmail TOPTAŞ)]
-**API Metodu:** DELETE
-**Açıklama:** Kullanıcının daha önce okuduğu ve bildirim kutusunda yer kaplamasını istemediği mesajları tek tek veya toplu olarak sistemden kaldırmasını sağlar.
+37. **Bildirim Silme** [(Mustafa İsmail TOPTAŞ)]
+* **API Metodu:** DELETE
+* **Açıklama:** Kullanıcının daha önce okuduğu ve bildirim kutusunda yer kaplamasını istemediği mesajları tek tek veya toplu olarak sistemden kaldırmasını sağlar.
 
 # Gereksinim Dağılımları
 
