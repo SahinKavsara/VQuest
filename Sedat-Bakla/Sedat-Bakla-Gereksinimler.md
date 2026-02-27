@@ -1,3 +1,4 @@
+
 1. Oda Oluşturma
 
 * **API Metodu:** POST
@@ -37,3 +38,4 @@
 
 * **API Metodu:** DELETE
 * **Açıklama:** Süresi dolan canlı odanın sonlandırılıp erişime kapatılması.
+
