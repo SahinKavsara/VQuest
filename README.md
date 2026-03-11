@@ -38,12 +38,12 @@
 
 Proje dokümantasyonuna aşağıdaki linklerden erişebilirsiniz:
 
-1. [Gereksinim Analizi](Gereksinim-Analizi.md)
-2. [REST API Tasarımı](API-Tasarimi.md)
-3. [REST API](Rest-API.md)
-4. [Web Front-End](WebFrontEnd.md)
-5. [Mobil Front-End](MobilFrontEnd.md)
-6. [Mobil Backend](MobilBackEnd.md)
-7. [Video Sunum](Sunum.md)
+1. [Gereksinim Analizi](MD-Dosyalari/Gereksinim-Analizi.md)
+2. [REST API Tasarımı](MD-Dosyalari/API-Tasarimi.md)
+3. [REST API](MD-Dosyalari/Rest-API.md)
+4. [Web Front-End](MD-Dosyalari/WebFrontEnd.md)
+5. [Mobil Front-End](MD-Dosyalari/MobilFrontEnd.md)
+6. [Mobil Backend](MD-Dosyalari/MobilBackEnd.md)
+7. [Video Sunum](MD-Dosyalari/Sunum.md)
 
 ---
