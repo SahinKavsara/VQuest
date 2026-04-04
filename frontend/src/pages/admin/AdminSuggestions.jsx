@@ -10,11 +10,11 @@ export default function AdminSuggestions() {
 
   const fetchSuggestions = async () => {
     try {
-      const { data } = await api.get('/suggestions'); // Admin sees all
+      const { data } = await api.get('/admin/suggestions'); // Admin sees all
       setSuggestions(data);
     } catch {
       setSuggestions([
-        { _id: '1', text: '1 byte kaç bittir?', options: ['4','8','16','32'], correctIndex: 1, category: 'Yazılım', suggestedBy: 'user1' }
+        { _id: '65f0123456789abcdef12345', questionText: 'Hata var: Gerçek data gelmedi. Backend kapalı olabilir.', options: ['Seçenek 1','Seçenek 2','Doğru Cevap','Yanlış'], correctAnswer: 'Doğru Cevap', category: { name: 'Bilinmiyor' }, user: { username: 'sistem' } }
       ]);
     } finally { setLoading(false); }
   };
@@ -22,9 +22,8 @@ export default function AdminSuggestions() {
   const handleAction = async (id, action) => {
     try {
       if(action === 'approve') {
-        // Find suggestion and push to questions
         const s = suggestions.find(s => s._id === id);
-        await api.post('/admin/questions', { text: s.text, options: s.options, correctIndex: s.correctIndex, category: s.category });
+        await api.post('/admin/questions', { text: s.questionText, options: s.options, correctAnswer: s.correctAnswer, category: s.category?._id || s.category });
         await api.delete(`/admin/suggestions/${id}`); // Assumes endpoint to clear suggestion
         toast.success('Öneri kabul edildi ve havuza eklendi');
       } else {
@@ -53,17 +52,17 @@ export default function AdminSuggestions() {
         <div className="grid-2">
           {suggestions.map(s => (
             <div key={s._id} className="card">
-              <span className="badge badge-info mb-2">{s.category}</span>
-              <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>{s.text}</h3>
+              <span className="badge badge-info mb-2">{s.category?.name || s.category || 'Belirtilmemiş'}</span>
+              <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>{s.questionText}</h3>
               <div style={{ marginBottom: '1.5rem', background: 'var(--bg-card-2)', padding: '1rem', borderRadius: '8px' }}>
                 {s.options.map((opt, i) => (
-                  <div key={i} style={{ color: i === s.correctIndex ? 'var(--success)' : 'inherit', fontWeight: i === s.correctIndex ? 'bold' : 'normal', marginBottom: '0.3rem' }}>
-                    {i === s.correctIndex ? '✓ ' : '○ '} {opt}
+                  <div key={i} style={{ color: opt === s.correctAnswer ? 'var(--success)' : 'inherit', fontWeight: opt === s.correctAnswer ? 'bold' : 'normal', marginBottom: '0.3rem' }}>
+                    {opt === s.correctAnswer ? '✓ ' : '○ '} {opt}
                   </div>
                 ))}
               </div>
               <div className="flex-between">
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Öneren: {s.suggestedBy}</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Öneren: {s.user?.username || s.user?.email || 'Bilinmeyen'}</span>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button className="btn btn-danger btn-sm" onClick={() => handleAction(s._id, 'reject')}>Reddet</button>
                   <button className="btn btn-success btn-sm" onClick={() => handleAction(s._id, 'approve')}>Kabul Et</button>
