@@ -107,8 +107,10 @@ export default function GameRoomPage() {
     try {
       const { data } = await api.post('/ai/analysis', { performanceData: log });
       setAiAnalysis(data.analysisText);
+      toast.success('Yapay zeka performansını analiz etti!');
     } catch (err) {
       console.error('AI error:', err);
+      toast.error('AI analizi şu anda yapılamadı. İstatistiklere dayalı özet gösteriliyor.');
     } finally {
       setAiLoading(false);
     }
@@ -143,7 +145,11 @@ export default function GameRoomPage() {
     setSelectedAnswer(index);
     const isCorrect = currentQuestion?.options[index] === currentQuestion?.correctAnswer;
     setIsCorrectLocal(isCorrect);
-    setPerformanceLog(prev => [...prev, { category: currentQuestion.category || room.category, isCorrect }]);
+    setPerformanceLog(prev => [...prev, { 
+      category: currentQuestion.category || room.category, 
+      isCorrect,
+      question: currentQuestion.text 
+    }]);
     
     // Sokete gönder (Skor güncellemesi için)
     socket.emit('submitAnswer', { 

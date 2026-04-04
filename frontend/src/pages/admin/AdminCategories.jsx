@@ -50,7 +50,13 @@ export default function AdminCategories() {
         <div className="grid-3">
           {categories.map(c => (
             <div key={c._id} className="card">
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)', marginBottom: '0.5rem' }}>{c.name}</h3>
+              <div className="flex-between mb-2">
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)' }}>{c.name}</h3>
+                <div style={{ display: 'flex', gap: '0.3rem' }}>
+                  <button className="btn btn-ghost btn-sm" title="Soruları Yönet" onClick={() => window.location.href=`/admin?category=${c.name}`}>👁️</button>
+                  <button className="btn btn-ghost btn-sm" title="Hızlı Soru Ekle" onClick={() => { setForm({ name: c.name, description: '' }); setShowModal(true); }}>➕</button>
+                </div>
+              </div>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{c.description}</p>
             </div>
           ))}

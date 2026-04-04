@@ -10,6 +10,7 @@ export default function AdminQuestions() {
   const [form, setForm] = useState({ text: '', options: ['', '', '', ''], correctIndex: 0, category: '' });
 
   const [stats, setStats] = useState(null);
+  const [filterCategory, setFilterCategory] = useState(null);
 
   const fetchAll = async () => {
     try {
@@ -27,15 +28,24 @@ export default function AdminQuestions() {
 
   useEffect(() => { 
     fetchAll(); 
-    // Dummy fetch for stats
-    setTimeout(() => {
-      setStats({
-        users: 124,
-        activeRooms: 3,
-        totalQuestions: 850,
-        pendingSuggestions: 12
-      });
-    }, 500);
+    // Real fetch for stats
+    const fetchStats = async () => {
+      try {
+        const { data } = await api.get('/admin/stats');
+        setStats(data);
+      } catch (err) {
+        console.error('Stats fetch error:', err);
+      }
+    };
+    fetchStats();
+
+    // URL'den kategori parametresini kontrol et
+    const params = new URLSearchParams(window.location.search);
+    const catParam = params.get('category');
+    if (catParam) {
+      setForm(f => ({ ...f, category: catParam }));
+      setFilterCategory(catParam);
+    }
   }, []);
 
   const handleCreate = async (e) => {
@@ -74,9 +84,16 @@ export default function AdminQuestions() {
           <h1 className="page-title">❓ Soru Havuzu ve Dashboard</h1>
           <p className="page-subtitle">Sistemin genel durumu ve ana soru havuzu</p>
         </div>
-        <button className="btn btn-primary" onClick={() => { setForm({ text: '', options: ['','','',''], correctIndex: 0, category: 'Yazılım' }); setShowModal(true); }}>
-          ➕ Yeni Soru Ekle
-        </button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          {filterCategory && (
+            <button className="btn btn-ghost" onClick={() => { setFilterCategory(null); window.history.replaceState({}, '', '/admin'); }}>
+              ✕ Filtreyi Kaldır ({filterCategory})
+            </button>
+          )}
+          <button className="btn btn-primary" onClick={() => { setForm({ text: '', options: ['','','',''], correctIndex: 0, category: filterCategory || 'Genel Kültür' }); setShowModal(true); }}>
+            ➕ Yeni Soru Ekle
+          </button>
+        </div>
       </div>
 
       {stats && (
@@ -118,7 +135,7 @@ export default function AdminQuestions() {
               </tr>
             </thead>
             <tbody>
-              {questions.map(q => (
+              {questions.filter(q => filterCategory ? q.category === filterCategory : true).map(q => (
                 <tr key={q._id}>
                   <td style={{ maxWidth: 350, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{q.text}</td>
                   <td><span className="badge badge-info">{q.category}</span></td>
