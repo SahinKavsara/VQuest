@@ -24,20 +24,17 @@ export default function LobbyPage() {
 
   const fetchData = async () => {
     try {
-      const [rRes, cRes, pRes] = await Promise.all([
-        api.get('/rooms'),
-        api.get('/categories'),
-        api.get('/packages')
-      ]);
-      const sRooms = Array.isArray(rRes.data) ? rRes.data : [];
-      const sCats = Array.isArray(cRes.data) ? cRes.data : [];
-      const sPkgs = Array.isArray(pRes.data) ? pRes.data : [];
+      const pRooms = api.get('/rooms').then(res => res.data).catch(() => []);
+      const pCats = api.get('/categories').then(res => res.data).catch(() => []);
+      const pPkgs = api.get('/packages').then(res => res.data).catch(() => []);
+
+      const [sRooms, sCats, sPkgs] = await Promise.all([pRooms, pCats, pPkgs]);
       
-      setRooms(sRooms);
-      setCategories(sCats);
-      setPackages(sPkgs);
+      setRooms(Array.isArray(sRooms) ? sRooms : []);
+      setCategories(Array.isArray(sCats) ? sCats : []);
+      setPackages(Array.isArray(sPkgs) ? sPkgs : []);
       
-      if (sCats.length > 0 && !form.category && !form.packageId) {
+      if (Array.isArray(sCats) && sCats.length > 0 && !form.category && !form.packageId) {
         setForm(f => ({ ...f, category: sCats[0].name }));
       }
     } catch (err) {

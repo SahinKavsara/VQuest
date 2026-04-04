@@ -9,6 +9,8 @@ export default function AdminQuestions() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ text: '', options: ['', '', '', ''], correctIndex: 0, category: '' });
 
+  const [stats, setStats] = useState(null);
+
   const fetchAll = async () => {
     try {
       const [qRes, cRes] = await Promise.all([
@@ -23,7 +25,18 @@ export default function AdminQuestions() {
     } finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { 
+    fetchAll(); 
+    // Dummy fetch for stats
+    setTimeout(() => {
+      setStats({
+        users: 124,
+        activeRooms: 3,
+        totalQuestions: 850,
+        pendingSuggestions: 12
+      });
+    }, 500);
+  }, []);
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -56,15 +69,40 @@ export default function AdminQuestions() {
 
   return (
     <div>
-      <div className="page-header flex-between">
+      <div className="page-header flex-between mb-3">
         <div>
-          <h1 className="page-title">❓ Soru Havuzu</h1>
-          <p className="page-subtitle">Sistemin ana soru havuzunu yönetin</p>
+          <h1 className="page-title">❓ Soru Havuzu ve Dashboard</h1>
+          <p className="page-subtitle">Sistemin genel durumu ve ana soru havuzu</p>
         </div>
         <button className="btn btn-primary" onClick={() => { setForm({ text: '', options: ['','','',''], correctIndex: 0, category: 'Yazılım' }); setShowModal(true); }}>
           ➕ Yeni Soru Ekle
         </button>
       </div>
+
+      {stats && (
+        <div className="stats-grid mb-3">
+          <div className="stat-card">
+            <div className="stat-icon">👥</div>
+            <div className="stat-value">{stats.users}</div>
+            <div className="stat-label">Toplam Kullanıcı</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">🚪</div>
+            <div className="stat-value">{stats.activeRooms}</div>
+            <div className="stat-label">Aktif Odalar</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">❓</div>
+            <div className="stat-value">{stats.totalQuestions}</div>
+            <div className="stat-label">Soru Havuzu</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">💡</div>
+            <div className="stat-value">{stats.pendingSuggestions}</div>
+            <div className="stat-label">Bekleyen Öneri</div>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="loading-center"><span className="spinner-lg spinner" /></div>
