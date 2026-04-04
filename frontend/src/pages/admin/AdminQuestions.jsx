@@ -7,6 +7,7 @@ export default function AdminQuestions() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null); // null = yeni, string = düzenleme
   const [form, setForm] = useState({ text: '', options: ['', '', '', ''], correctIndex: 0, category: '' });
 
   const [stats, setStats] = useState(null);
@@ -62,6 +63,33 @@ export default function AdminQuestions() {
     } catch { toast.error('Soru eklenemedi'); }
   };
 
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        ...form,
+        correctAnswer: form.options[form.correctIndex]
+      };
+      const { data } = await api.put(`/admin/questions/${editingId}`, payload);
+      setQuestions(prev => prev.map(q => q._id === editingId ? data : q));
+      setShowModal(false);
+      setEditingId(null);
+      toast.success('Soru güncellendi');
+    } catch { toast.error('Soru güncellenemedi'); }
+  };
+
+  const openEdit = (q) => {
+    const correctIndex = q.options.findIndex(o => o === q.correctAnswer);
+    setForm({
+      text: q.text,
+      options: [...q.options],
+      correctIndex: correctIndex >= 0 ? correctIndex : 0,
+      category: q.category || ''
+    });
+    setEditingId(q._id);
+    setShowModal(true);
+  };
+
   const handleDelete = async (id) => {
     if(!window.confirm('Bu soruyu silmek istediğinize emin misiniz?')) return;
     try {
@@ -90,7 +118,7 @@ export default function AdminQuestions() {
               ✕ Filtreyi Kaldır ({filterCategory})
             </button>
           )}
-          <button className="btn btn-primary" onClick={() => { setForm({ text: '', options: ['','','',''], correctIndex: 0, category: filterCategory || 'Genel Kültür' }); setShowModal(true); }}>
+          <button className="btn btn-primary" onClick={() => { setForm({ text: '', options: ['','','',''], correctIndex: 0, category: filterCategory || 'Genel Kültür' }); setEditingId(null); setShowModal(true); }}>
             ➕ Yeni Soru Ekle
           </button>
         </div>
@@ -141,7 +169,10 @@ export default function AdminQuestions() {
                   <td><span className="badge badge-info">{q.category}</span></td>
                   <td><span className="text-success font-bold">{q.correctAnswer || q.options[q.correctIndex]}</span></td>
                   <td>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(q._id)}>🗑️</button>
+                    <div style={{ display: 'flex', gap: '0.4rem' }}>
+                      <button className="btn btn-ghost btn-sm" onClick={() => openEdit(q)}>✏️</button>
+                      <button className="btn btn-danger btn-sm" onClick={() => handleDelete(q._id)}>🗑️</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -154,10 +185,10 @@ export default function AdminQuestions() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 640 }}>
             <div className="modal-header">
-              <h3 className="modal-title">Soru Ekle</h3>
+              <h3 className="modal-title">{editingId ? 'Soruyu Düzenle' : 'Soru Ekle'}</h3>
               <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}>✕</button>
             </div>
-            <form onSubmit={handleCreate}>
+            <form onSubmit={editingId ? handleUpdate : handleCreate}>
               <div className="form-group">
                 <label className="form-label">Kategori</label>
                 <select className="form-input" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>

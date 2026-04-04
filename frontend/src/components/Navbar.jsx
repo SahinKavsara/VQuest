@@ -19,6 +19,7 @@ export const Navbar = () => {
                 <Link to="/packages" className={`nav-link ${p.startsWith('/packages') ? 'active' : ''}`}>Paketler</Link>
               )}
               <Link to="/profile" className={`nav-link ${p === '/profile' ? 'active' : ''}`}>Profil</Link>
+              <Link to="/analysis" className={`nav-link ${p === '/analysis' ? 'active' : ''}`}>Analizler</Link>
               {user?.role === 'admin' && (
                 <>
                   <Link to="/admin" className="nav-link" style={{ color: 'var(--warning)' }}>Admin</Link>
@@ -49,6 +50,9 @@ export const Navbar = () => {
               )}
               <Link to="/profile" className={`mobile-nav-item ${p === '/profile' ? 'active' : ''}`}>
                 <div className="mobile-nav-icon">👤</div><span>Profil</span>
+             </Link>
+              <Link to="/analysis" className={`mobile-nav-item ${p === '/analysis' ? 'active' : ''}`}>
+                <div className="mobile-nav-icon">📊</div><span>Analizler</span>
              </Link>
               {user?.role === 'admin' && (
                  <Link to="/admin" className={`mobile-nav-item ${p.startsWith('/admin') ? 'active' : ''}`}>

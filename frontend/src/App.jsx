@@ -13,7 +13,6 @@ import LobbyPage from './pages/LobbyPage';
 import GameRoomPage from './pages/GameRoomPage';
 import ProfilePage from './pages/ProfilePage';
 import PackagesPage from './pages/PackagesPage';
-import SuggestPage from './pages/SuggestPage';
 import NotificationsPage from './pages/NotificationsPage';
 import AnalysisPage from './pages/AnalysisPage';
 
@@ -23,7 +22,6 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminQuestions from './pages/admin/AdminQuestions';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminRooms from './pages/admin/AdminRooms';
-import AdminSuggestions from './pages/admin/AdminSuggestions';
 import AdminNotifications from './pages/admin/AdminNotifications';
 import AdminAiPrompt from './pages/admin/AdminAiPrompt';
 
@@ -56,8 +54,11 @@ export default function App() {
   useEffect(() => {
     setIsReady(true);
     
+    // Socket bağlantısını kur (bildirimleri dinlemek için)
+    const s = socket.connect();
+
     // Global bildirim dinleyici
-    socket.on('newNotification', (data) => {
+    s.on('newNotification', (data) => {
       toast(data.message, {
         icon: '🔔',
         duration: 5000,
@@ -68,7 +69,7 @@ export default function App() {
     });
 
     return () => {
-      socket.off('newNotification');
+      s.off('newNotification');
     };
   }, []);
 
@@ -88,7 +89,6 @@ export default function App() {
         <Route path="/rooms/:roomId" element={<ProtectedRoute><UserLayout><GameRoomPage /></UserLayout></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><UserLayout><ProfilePage /></UserLayout></ProtectedRoute>} />
         <Route path="/packages" element={<ProtectedRoute><UserLayout><PackagesPage /></UserLayout></ProtectedRoute>} />
-        <Route path="/suggest" element={<ProtectedRoute><UserLayout><SuggestPage /></UserLayout></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute><UserLayout><NotificationsPage /></UserLayout></ProtectedRoute>} />
         <Route path="/analysis" element={<ProtectedRoute><UserLayout><AnalysisPage /></UserLayout></ProtectedRoute>} />
 
@@ -97,7 +97,6 @@ export default function App() {
         <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminLayout><AdminUsers /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/categories" element={<ProtectedRoute adminOnly><AdminLayout><AdminCategories /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/rooms" element={<ProtectedRoute adminOnly><AdminLayout><AdminRooms /></AdminLayout></ProtectedRoute>} />
-        <Route path="/admin/suggestions" element={<ProtectedRoute adminOnly><AdminLayout><AdminSuggestions /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/notifications" element={<ProtectedRoute adminOnly><AdminLayout><AdminNotifications /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/ai-prompt" element={<ProtectedRoute adminOnly><AdminLayout><AdminAiPrompt /></AdminLayout></ProtectedRoute>} />
 

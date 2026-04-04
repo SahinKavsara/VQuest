@@ -32,7 +32,19 @@ export default function LobbyPage() {
       
       setRooms(Array.isArray(sRooms) ? sRooms : []);
       setCategories(Array.isArray(sCats) ? sCats : []);
-      setPackages(Array.isArray(sPkgs) ? sPkgs : []);
+
+      // Sadece mevcut kategorilerle ilişkili paketleri göster
+      const categoryNames = Array.isArray(sCats) ? sCats.map(c => c.name) : [];
+      const filteredPkgs = Array.isArray(sPkgs)
+        ? sPkgs.filter(pkg =>
+            Array.isArray(pkg.questions) &&
+            pkg.questions.some(q => {
+              const cat = typeof q === 'object' ? q.category : null;
+              return cat && categoryNames.includes(cat);
+            })
+          )
+        : [];
+      setPackages(filteredPkgs);
       
       if (Array.isArray(sCats) && sCats.length > 0 && !form.category && !form.packageId) {
         setForm(f => ({ ...f, category: sCats[0].name }));
@@ -44,6 +56,7 @@ export default function LobbyPage() {
       setPackages([]);
     } finally { setLoading(false); }
   };
+
 
   useEffect(() => { 
     fetchData(); 

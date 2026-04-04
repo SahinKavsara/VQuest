@@ -113,11 +113,6 @@ export default function PackagesPage() {
         </div>
       )}
 
-      <div className="card mt-2" style={{ textAlign: 'center', padding: '1.5rem' }}>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>Ana soru havuzuna katkı sağlamak ister misin?</p>
-        <a href="/suggest" className="btn btn-ghost">💡 Soru Öner</a>
-      </div>
-
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
