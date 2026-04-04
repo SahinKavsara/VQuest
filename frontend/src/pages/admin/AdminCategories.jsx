@@ -6,6 +6,7 @@ export default function AdminCategories() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ name: '', description: '' });
 
   useEffect(() => { fetchCats(); }, []);
@@ -32,6 +33,23 @@ export default function AdminCategories() {
     } catch { toast.error('Eklenemedi'); }
   };
 
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await api.put(`/admin/categories/${editingId}`, form);
+      setCategories(prev => prev.map(c => c._id === editingId ? data : c));
+      setShowModal(false);
+      setEditingId(null);
+      toast.success('Kategori güncellendi');
+    } catch { toast.error('Güncellenemedi'); }
+  };
+
+  const openEdit = (c) => {
+    setForm({ name: c.name, description: c.description || '' });
+    setEditingId(c._id);
+    setShowModal(true);
+  };
+
   return (
     <div>
       <div className="page-header flex-between">
@@ -39,7 +57,7 @@ export default function AdminCategories() {
           <h1 className="page-title">🏷️ Kategori Yönetimi</h1>
           <p className="page-subtitle">Soru kategorilerini düzenleyin</p>
         </div>
-        <button className="btn btn-primary" onClick={() => { setForm({name:'', description:''}); setShowModal(true); }}>
+        <button className="btn btn-primary" onClick={() => { setForm({name:'', description:''}); setEditingId(null); setShowModal(true); }}>
           ➕ Yeni Kategori
         </button>
       </div>
@@ -53,8 +71,9 @@ export default function AdminCategories() {
               <div className="flex-between mb-2">
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--accent)' }}>{c.name}</h3>
                 <div style={{ display: 'flex', gap: '0.3rem' }}>
+                  <button className="btn btn-ghost btn-sm" title="Düzeyle" onClick={() => openEdit(c)}>✏️</button>
                   <button className="btn btn-ghost btn-sm" title="Soruları Yönet" onClick={() => window.location.href=`/admin?category=${c.name}`}>👁️</button>
-                  <button className="btn btn-ghost btn-sm" title="Hızlı Soru Ekle" onClick={() => { setForm({ name: c.name, description: '' }); setShowModal(true); }}>➕</button>
+                  <button className="btn btn-ghost btn-sm" title="Hızlı Soru Ekle" onClick={() => { setForm({ name: c.name, description: '' }); setEditingId(null); setShowModal(true); }}>➕</button>
                 </div>
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{c.description}</p>
@@ -67,10 +86,10 @@ export default function AdminCategories() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-               <h3 className="modal-title">Kategori Ekle</h3>
+               <h3 className="modal-title">{editingId ? 'Kategoriyi Düzeyle' : 'Kategori Ekle'}</h3>
                <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}>✕</button>
             </div>
-            <form onSubmit={handleCreate}>
+            <form onSubmit={editingId ? handleUpdate : handleCreate}>
               <div className="form-group">
                 <label className="form-label">Kategori Adı</label>
                 <input className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />

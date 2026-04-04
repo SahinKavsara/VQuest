@@ -6,13 +6,21 @@ class SocketService {
   socket = null;
 
   connect() {
-    if (!this.socket) {
-      this.socket = io(SOCKET_URL);
+    if (!this.socket || !this.socket.connected) {
+      this.socket = io(SOCKET_URL, { autoConnect: true });
       console.log('Socket bağlandı');
     }
     return this.socket;
   }
 
+  // Sadece oda bağlantısını kes (App.jsx dinleyicilerini koru)
+  leaveRoom() {
+    if (this.socket) {
+      this.socket.emit('leaveRoom');
+    }
+  }
+
+  // Tamamen bağlantıyı kes (uygulama kapanırken)
   disconnect() {
     if (this.socket) {
       this.socket.disconnect();

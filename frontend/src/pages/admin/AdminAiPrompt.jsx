@@ -1,12 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 export default function AdminAiPrompt() {
-  const [promptText, setPromptText] = useState(
-    'Kullanıcının performansını analiz et. Kategorilere göre zayıf ve güçlü yönlerini belirle ve motive edici tavsiyeler ver. Çıktı çok uzun olmasın, kolay okunabilir bir formatta olsun.'
-  );
+  const [promptText, setPromptText] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchPrompt = async () => {
+      try {
+        const { data } = await api.get('/admin/ai/prompt');
+        if (data && data.promptText) {
+          setPromptText(data.promptText);
+        }
+      } catch (err) {
+        toast.error('Mevcut prompt alınamadı');
+      }
+    };
+    fetchPrompt();
+  }, []);
 
   const handleSave = async (e) => {
     e.preventDefault();

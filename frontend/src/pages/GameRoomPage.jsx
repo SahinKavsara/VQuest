@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -12,35 +12,43 @@ export default function GameRoomPage() {
   const [phase, setPhase] = useState('lobby'); // lobby, playing, result
   const [timeLeft, setTimeLeft] = useState(15);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const [room, setRoom] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isCorrectLocal, setIsCorrectLocal] = useState(null);
-  const [performanceLog, setPerformanceLog] = useState([]); // [{ category, isCorrect }]
+  const [performanceLog, setPerformanceLog] = useState([]);
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
+  const [correctAnswerText, setCorrectAnswerText] = useState('');
+
+  // ref: en güncel değerlere timer içinden erişmek için
+  const questionsRef = useRef([]);
+  const currentQuestionIndexRef = useRef(0);
+  const performanceLogRef = useRef([]);
+  const isHostRef = useRef(false);
 
   const fetchData = async () => {
     try {
       const { data: found } = await api.get(`/rooms/${roomId}`); 
       
-      // Eğer kullanıcı katılımcı değilse, odaya katıl
       const isParticipant = found.participants.some(p => (p.userId?._id || p.userId) === (user?._id || user?.id));
       if (!isParticipant) {
         await api.put(`/rooms/${roomId}/join`);
-        // Yeniden çek ki katılımcı listesi güncel olsun
         const { data: refreshed } = await api.get(`/rooms/${roomId}`);
         setRoom(refreshed);
+        isHostRef.current = (refreshed.hostId?._id || refreshed.hostId) === (user?.id || user?._id);
       } else {
         setRoom(found);
+        isHostRef.current = (found.hostId?._id || found.hostId) === (user?.id || user?._id);
       }
 
-      // Sorular zaten backend tarafından populate edildi
       const roomQs = found.questions || [];
       setQuestions(roomQs);
-      if (roomQs.length > 0 && !currentQuestion) {
+      questionsRef.current = roomQs;
+      if (roomQs.length > 0) {
         setCurrentQuestion(roomQs[0]);
       }
     } catch (err) {
@@ -48,6 +56,23 @@ export default function GameRoomPage() {
        toast.error('Oda verisi alınamadı');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Sonraki soruya geç
+  const advanceQuestion = (nextIdx) => {
+    const allQs = questionsRef.current;
+    setShowCorrectAnswer(false);
+    setCorrectAnswerText('');
+    if (nextIdx < allQs.length) {
+      currentQuestionIndexRef.current = nextIdx;
+      setCurrentQuestionIndex(nextIdx);
+      setCurrentQuestion(allQs[nextIdx]);
+      setTimeLeft(15);
+      setSelectedAnswer(null);
+    } else {
+      // Tüm sorular bitti
+      setPhase('result');
     }
   };
 
@@ -64,9 +89,20 @@ export default function GameRoomPage() {
     s.on('gameStarted', () => {
       setPhase('playing');
       setTimeLeft(15);
-      setIsCorrectLocal(null);
       setSelectedAnswer(null);
       toast.success('Oyun Başladı!');
+    });
+
+    // Tüm oyuncular bu event ile aynı anda sonraki soruya geçer
+    s.on('nextQuestion', ({ questionIndex, correctAnswer }) => {
+      // Doğru cevabı 5 saniye göster, sonra soruya geç
+      if (correctAnswer) {
+        setShowCorrectAnswer(true);
+        setCorrectAnswerText(correctAnswer);
+        setTimeout(() => advanceQuestion(questionIndex), 5000);
+      } else {
+        advanceQuestion(questionIndex);
+      }
     });
 
     s.on('roomClosed', () => {
@@ -75,32 +111,34 @@ export default function GameRoomPage() {
     });
 
     return () => {
-      socket.disconnect();
+      socket.leaveRoom();
     };
   }, [roomId]);
 
-  // Timer logic
+  // Timer — sadece host'un timerı 0'a gelince socket ile nextQuestion yayınlar
   useEffect(() => {
-    if (phase === 'playing' && timeLeft > 0) {
+    if (phase !== 'playing') return;
+    if (timeLeft > 0) {
       const timerId = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
       return () => clearTimeout(timerId);
-    } else if (phase === 'playing' && timeLeft === 0) {
-      setPhase('result');
-      if (isCorrectLocal === true) {
-         toast.success('Tebrikler! Doğru cevap.', { icon: '⭐️' });
-      } else if (isCorrectLocal === false) {
-         toast.error('Maalesef yanlış cevap.');
-      } else {
-         toast.error('Süre bitti, cevap vermedin!');
+    } else {
+      // Süre bitti — Doğru cevabı al, socket ile herkese yayınla
+      const currentQ = questionsRef.current[currentQuestionIndexRef.current];
+      const correctAnswer = currentQ?.correctAnswer || '';
+      // Doğru cevabı 5 sn göster
+      setShowCorrectAnswer(true);
+      setCorrectAnswerText(correctAnswer);
+      if (isHostRef.current) {
+        const nextIdx = currentQuestionIndexRef.current + 1;
+        // 5 saniye sonra socket ile herkese nextQuestion gönder
+        setTimeout(() => {
+          socket.emit('nextQuestion', { roomId, questionIndex: nextIdx, correctAnswer });
+          advanceQuestion(nextIdx);
+        }, 5000);
       }
-
-      // Eğer oyun bittiyse (tüm sorular cevaplandıysa veya odadaki son durumsa) AI analizi iste
-      // Bu örnekte her soru sonucunda değil aslında toplu yapılması isteniyor.
-      // Basitleştirmek için: Eğer bu son soruysa (questions array indisi bittiyse) tetiklenebilir
-      // Veya direkt her soru sonucu 'result' fazında geçici gösterilebilir.
-      // Kullanıcı "Oyun bittiğinde Leaderboard ekranında" dediği için final faza saklayalım.
+      // Non-host oyuncular 'nextQuestion' socket event'ini bekler
     }
-  }, [phase, timeLeft, isCorrectLocal, selectedAnswer, currentQuestion]);
+  }, [phase, timeLeft]);
 
   const fetchAiAnalysis = async (log) => {
     setAiLoading(true);
@@ -108,57 +146,66 @@ export default function GameRoomPage() {
       const { data } = await api.post('/ai/analysis', { performanceData: log });
       setAiAnalysis(data.analysisText);
       toast.success('Yapay zeka performansını analiz etti!');
+      // localStorage'a kaydet (AnalysisPage'de gösterilmek üzere)
+      const report = { _id: Date.now().toString(), analysisText: data.analysisText, createdAt: new Date().toISOString() };
+      const existing = JSON.parse(localStorage.getItem('vquest_ai_reports') || '[]');
+      localStorage.setItem('vquest_ai_reports', JSON.stringify([report, ...existing]));
     } catch (err) {
       console.error('AI error:', err);
-      toast.error('AI analizi şu anda yapılamadı. İstatistiklere dayalı özet gösteriliyor.');
     } finally {
       setAiLoading(false);
     }
   };
 
-  // Oyun bittiğinde AI analizini tetikle
+  // Oyun bittiğinde AI analizi
   useEffect(() => {
-    if (phase === 'result' && performanceLog.length > 0) {
-       // Küçük bir gecikme ekleyerek son cevabın state'e tam işlendiğinden emin olalım
+    if (phase === 'result' && performanceLogRef.current.length > 0) {
        const timer = setTimeout(() => {
-         fetchAiAnalysis(performanceLog);
+         fetchAiAnalysis(performanceLogRef.current);
        }, 500);
        return () => clearTimeout(timer);
-    } else if (phase === 'result' && performanceLog.length === 0) {
+    } else if (phase === 'result' && performanceLogRef.current.length === 0) {
        setAiAnalysis("Harika bir oyundu! Bir dahaki sefere daha fazla soruyla analiz yapabilirim.");
     }
   }, [phase]);
 
   const startRoomGame = async () => {
     try {
-      // API'ye söyle (DB güncellemesi için)
       await api.post(`/rooms/${roomId}/start`);
-      // Socket ile herkese duyur
       socket.emit('startGame', { roomId });
     } catch (err) {
       toast.error('Oyun başlatılamadı');
     }
   };
 
-  const answerQuestion = async (index) => {
-    if (selectedAnswer !== null) return;
+  const answerQuestion = (index) => {
+    if (selectedAnswer !== null) return; // Zaten cevaplandı
     setSelectedAnswer(index);
+
     const isCorrect = currentQuestion?.options[index] === currentQuestion?.correctAnswer;
-    setIsCorrectLocal(isCorrect);
-    setPerformanceLog(prev => [...prev, { 
-      category: currentQuestion.category || room.category, 
+
+    // Performans kaydı (oyun sonu için)
+    const newLog = [...performanceLogRef.current, { 
+      category: currentQuestion.category || room?.name || room?.category || 'Genel', 
       isCorrect,
       question: currentQuestion.text 
-    }]);
-    
-    // Sokete gönder (Skor güncellemesi için)
+    }];
+    performanceLogRef.current = newLog;
+    setPerformanceLog(newLog);
+
+    // Sokete skor gönder
     socket.emit('submitAnswer', { 
       roomId, 
       userId: user?._id || user?.id, 
       isCorrect, 
-      score: timeLeft * 10 // Kalan saniye bazlı puan
+      score: timeLeft * 10
     });
-    // NO TOAST HERE - Wait for timer end
+
+    // Doğru/yanlış gösterilmez — sadece "Cevabın alındı" bilgisi
+    toast('Cevabın kaydedildi, süre dolana kadar bekle...', {
+      icon: '⏳',
+      duration: 2000,
+    });
   };
 
   const closeRoomSession = () => {
@@ -255,9 +302,34 @@ export default function GameRoomPage() {
         <div className="timer-bar" style={{ width: `${(timeLeft / 15) * 100}%` }} />
       </div>
 
-      <div style={{ fontSize: '3rem', fontWeight: 800, textShadow: 'var(--glow)', marginBottom: '2rem' }}>
-        {timeLeft}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0 0.5rem' }}>
+        <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+          Soru {currentQuestionIndex + 1} / {questions.length}
+        </span>
+        <div style={{ fontSize: '2.5rem', fontWeight: 800, textShadow: 'var(--glow)' }}>
+          {timeLeft}
+        </div>
+        <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+          {selectedAnswer !== null ? '✅ Cevap verildi' : '⏳ Bekleniyor'}
+        </span>
       </div>
+
+      {/* Doğru Cevap Banner — süre bitince 5 sn gösterilir */}
+      {showCorrectAnswer && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05))',
+          border: '2px solid #22c55e',
+          borderRadius: '12px',
+          padding: '1.2rem 2rem',
+          marginBottom: '1rem',
+          fontSize: '1.2rem',
+          fontWeight: 700,
+          color: '#22c55e',
+          letterSpacing: '0.02em',
+        }}>
+          ✅ Doğru Cevap: {correctAnswerText}
+        </div>
+      )}
 
       <div className="card mb-3" style={{ padding: '3rem 2rem' }}>
         <h2 style={{ fontSize: '2rem', margin: 0 }}>{currentQuestion?.text}</h2>
@@ -269,8 +341,13 @@ export default function GameRoomPage() {
              key={i} 
              className={`answer-btn answer-btn-${i} ${selectedAnswer === i ? 'answer-selected' : ''}`}
              onClick={() => answerQuestion(i)}
-             disabled={selectedAnswer !== null}
-             style={{ minHeight: 120, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+             disabled={selectedAnswer !== null || showCorrectAnswer}
+             style={{ 
+               minHeight: 120, 
+               display: 'flex', 
+               alignItems: 'center', 
+               justifyContent: 'center',
+             }}
            >
              {opt}
            </button>
