@@ -47,12 +47,29 @@ const AdminLayout = ({ children }) => (
 );
 
 import { useState, useEffect } from 'react';
+import socket from './services/socket';
+import toast from 'react-hot-toast';
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     setIsReady(true);
+    
+    // Global bildirim dinleyici
+    socket.on('newNotification', (data) => {
+      toast(data.message, {
+        icon: '🔔',
+        duration: 5000,
+        style: {
+          borderLeft: '4px solid #6c47ff'
+        }
+      });
+    });
+
+    return () => {
+      socket.off('newNotification');
+    };
   }, []);
 
   if (!isReady) return <div className="loading-center"><span className="spinner-lg spinner" /></div>;

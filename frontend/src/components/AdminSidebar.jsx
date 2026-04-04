@@ -4,10 +4,10 @@ export const AdminSidebar = () => {
   const p = useLocation().pathname;
   
   const links = [
-    { name: 'Soru Havuzu', path: '/admin', icon: '❓' },
+    { name: 'Dashboard', path: '/admin', icon: '📊' },
+    { name: 'Kategoriler', path: '/admin/categories', icon: '🏷️' },
     { name: 'Kullanıcılar', path: '/admin/users', icon: '👥' },
     { name: 'Odalar', path: '/admin/rooms', icon: '🚪' },
-    { name: 'Kategoriler', path: '/admin/categories', icon: '🏷️' },
     { name: 'Soru Önerileri', path: '/admin/suggestions', icon: '💡' },
     { name: 'Duyurular', path: '/admin/notifications', icon: '📢' },
     { name: 'AI Prompt', path: '/admin/ai-prompt', icon: '🤖' }
