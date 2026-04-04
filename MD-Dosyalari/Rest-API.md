@@ -1,16 +1,15 @@
-# REST API Görev Dağılımı
+# VQuest REST API Görev Dağılımı
 
-**REST API Adresi:** [api.yazmuh.com](https://api.yazmuh.com)
+**REST API Adresi:** [http://localhost:3000/api](http://localhost:3000/api) (Local Server)
 
-Bu dokümanda, proje ekibindeki her üyenin geliştirmekten sorumlu olduğu REST API metotları listelenmektedir.
+Bu dokümanda, VQuest projesinin Backend (Route/Controller) ekibindeki her üyenin geliştirmekten sorumlu olduğu REST API uç noktaları (Endpoints) listelenmektedir.
 
 ---
 
 ## Grup Üyelerinin REST API Metotları
 
-1. [Ali Tutar'ın REST API Metotları](Ali-Tutar/Ali-Tutar-Rest-API-Gorevleri.md)
-2. [Grup Üyesi 2'nin REST API Metotları](Grup-Uyesi-2/Grup-Uyesi-2-Rest-API-Gorevleri.md)
-3. [Grup Üyesi 3'ün REST API Metotları](Grup-Uyesi-3/Grup-Uyesi-3-Rest-API-Gorevleri.md)
-4. [Grup Üyesi 4'ün REST API Metotları](Grup-Uyesi-4/Grup-Uyesi-4-Rest-API-Gorevleri.md)
-5. [Grup Üyesi 5'in REST API Metotları](Grup-Uyesi-5/Grup-Uyesi-5-Rest-API-Gorevleri.md)
-6. [Grup Üyesi 6'nın REST API Metotları](Grup-Uyesi-6/Grup-Uyesi-6-Rest-API-Gorevleri.md)
+1. [Şahin Kavsara'nın REST API Metotları](../Sahsi-Dosyalar/Sahin-Kavsara/Sahin-Kavsara-Rest-API-Gorevleri.md)
+2. [Mustafa İsmail Toptaş'ın REST API Metotları](Grup-Uyesi-2/Grup-Uyesi-2-Rest-API-Gorevleri.md)
+3. [Ömer Said Karakuş'un REST API Metotları](Grup-Uyesi-3/Grup-Uyesi-3-Rest-API-Gorevleri.md)
+4. [Emir Omrak'ın REST API Metotları](Grup-Uyesi-4/Grup-Uyesi-4-Rest-API-Gorevleri.md)
+5. [Sedat Bakla'nın REST API Metotları](Grup-Uyesi-5/Grup-Uyesi-5-Rest-API-Gorevleri.md)

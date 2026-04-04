@@ -8,7 +8,7 @@ Bu dokümanda, VQuest projesinin kullanıcı arayüzü (UI) ve kullanıcı deney
 
 ## Grup Üyelerinin Web Frontend Görevleri
 
-1. [Şahin Kavsara'nın Web Frontend Görevleri](Sahsi-Dosyalar/Sahin-Kavsara/Sahin-Kavsara-Web-Frontend-Gorevleri.md)
+1. [Şahin Kavsara'nın Web Frontend Görevleri](../Sahsi-Dosyalar/Sahin-Kavsara/Sahin-Kavsara-Web-Frontend-Gorevleri.md)
 2. [Mustafa İsmail Toptaş'ın Web Frontend Görevleri](Grup-Uyesi-2/Grup-Uyesi-2-Frontend-Gorevleri.md)
 3. [Ömer Said Karakuş'un Web Frontend Görevleri](Grup-Uyesi-3/Grup-Uyesi-3-Frontend-Gorevleri.md)
 4. [Emir Omrak'ın Web Frontend Görevleri](Grup-Uyesi-4/Grup-Uyesi-4-Frontend-Gorevleri.md)
