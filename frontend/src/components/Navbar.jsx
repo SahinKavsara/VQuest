@@ -2,7 +2,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
 export const Navbar = () => {
-  const { user, logout, isAdmin } = useAuthStore();
+  const { user, logout } = useAuthStore();
+  const isAdmin = user?.role === 'admin';
   const location = useLocation();
   const p = location.pathname;
 
@@ -20,7 +21,6 @@ export const Navbar = () => {
               <Link to="/profile" className={`nav-link ${p === '/profile' ? 'active' : ''}`}>Profil</Link>
               {user?.role === 'admin' && (
                 <>
-                  <Link to="/admin/questions" className="nav-link" style={{ color: 'var(--accent)' }}>Soru Havuzu</Link>
                   <Link to="/admin" className="nav-link" style={{ color: 'var(--warning)' }}>Admin</Link>
                 </>
               )}

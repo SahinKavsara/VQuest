@@ -114,10 +114,16 @@ export default function GameRoomPage() {
     }
   };
 
-  // Oyun bittiğinde AI analizini tetikle (Basitleştirilmiş: phase result olduğunda ve questions bittiğinde)
+  // Oyun bittiğinde AI analizini tetikle
   useEffect(() => {
-    if (phase === 'result' && questions.length > 0 && currentQuestion?._id === questions[questions.length - 1]?._id) {
-       fetchAiAnalysis(performanceLog);
+    if (phase === 'result' && performanceLog.length > 0) {
+       // Küçük bir gecikme ekleyerek son cevabın state'e tam işlendiğinden emin olalım
+       const timer = setTimeout(() => {
+         fetchAiAnalysis(performanceLog);
+       }, 500);
+       return () => clearTimeout(timer);
+    } else if (phase === 'result' && performanceLog.length === 0) {
+       setAiAnalysis("Harika bir oyundu! Bir dahaki sefere daha fazla soruyla analiz yapabilirim.");
     }
   }, [phase]);
 

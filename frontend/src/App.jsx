@@ -18,7 +18,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import AnalysisPage from './pages/AnalysisPage';
 
 // Admin Pages
-import AdminDashboard from './pages/admin/AdminDashboard';
+
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminQuestions from './pages/admin/AdminQuestions';
 import AdminCategories from './pages/admin/AdminCategories';
@@ -46,7 +46,17 @@ const AdminLayout = ({ children }) => (
   </div>
 );
 
+import { useState, useEffect } from 'react';
+
 export default function App() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    setIsReady(true);
+  }, []);
+
+  if (!isReady) return <div className="loading-center"><span className="spinner-lg spinner" /></div>;
+
   return (
     <Router>
       <Toaster position="top-right" toastOptions={{ style: { background: '#1c2040', color: '#e8eaf6', border: '1px solid rgba(108,71,255,0.4)' } }} />
@@ -66,9 +76,8 @@ export default function App() {
         <Route path="/analysis" element={<ProtectedRoute><UserLayout><AnalysisPage /></UserLayout></ProtectedRoute>} />
 
         {/* Admin Routes */}
-        <Route path="/admin" element={<ProtectedRoute adminOnly><AdminLayout><AdminDashboard /></AdminLayout></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute adminOnly><AdminLayout><AdminQuestions /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminLayout><AdminUsers /></AdminLayout></ProtectedRoute>} />
-        <Route path="/admin/questions" element={<ProtectedRoute adminOnly><AdminLayout><AdminQuestions /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/categories" element={<ProtectedRoute adminOnly><AdminLayout><AdminCategories /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/rooms" element={<ProtectedRoute adminOnly><AdminLayout><AdminRooms /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/suggestions" element={<ProtectedRoute adminOnly><AdminLayout><AdminSuggestions /></AdminLayout></ProtectedRoute>} />

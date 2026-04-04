@@ -8,15 +8,15 @@ export const useAuthStore = create(
       token: null,
       
       login: (userData, authToken) => set({ user: userData, token: authToken }),
-      logout: () => set({ user: null, token: null }),
-      updateUser: (data) => set({ user: { ...get().user, ...data } }),
-      
-      get isAdmin() {
-        return get().user?.role === 'admin';
-      }
+      logout: () => {
+        set({ user: null, token: null });
+        localStorage.removeItem('vquest-auth');
+      },
+      updateUser: (data) => set({ user: { ...get().user, ...data } })
     }),
     {
       name: 'vquest-auth',
+      partialize: (state) => ({ user: state.user, token: state.token })
     }
   )
 );
