@@ -22,7 +22,7 @@ const app = express();
 const httpServer = createServer(app);
 initSocket(httpServer);
 
-connectDB();
+await connectDB();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
