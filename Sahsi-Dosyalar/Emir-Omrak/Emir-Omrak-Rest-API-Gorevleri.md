@@ -1,7 +1,6 @@
 # Emir Omrak'ın REST API Metotları
 
-https://youtu.be/usTNg_cH_GY
-
+https://youtu.be/Dll6bJV7fb8
 ## Ana Soru Havuzu (Questions) İşlemleri
 
 1. Sistemdeki Soruları Listeleme
