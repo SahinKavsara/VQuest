@@ -1,6 +1,6 @@
 # VQuest REST API Görev Dağılımı
 
-**REST API Adresi:** [http://localhost:3000/api](http://localhost:3000/api) (Local Server)
+**REST API Adresi:** https://vquest-backend-api.onrender.com
 
 Bu dokümanda, VQuest projesinin Backend (Route/Controller) ekibindeki her üyenin geliştirmekten sorumlu olduğu REST API uç noktaları (Endpoints) listelenmektedir.
 
