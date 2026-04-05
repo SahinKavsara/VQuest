@@ -1,6 +1,6 @@
 # Emir Omrak'ın REST API Metotları
 
-API Test Videosu: Link buraya eklenecek
+https://youtu.be/usTNg_cH_GY
 
 ## Ana Soru Havuzu (Questions) İşlemleri
 
