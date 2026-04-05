@@ -1,5 +1,5 @@
 # Şahin Kavsara'nın Web Frontend Görevleri
-Front-end Test Videosu: [Buraya Tıklayarak İzleyin](https://drive.google.com/file/d/1ImDIuVVli9-kYcLQKjN0T3wrLm7B-883/view?usp=sharing)
+Front-end Test Videosu: https://youtu.be/XHhygtYsiD8
 
 ### 1. Özel Soru Paketleri Yönetim Sayfası (Listeleme & Oluşturma)
 **API Endpoint:** `GET /packages` | `POST /packages`
