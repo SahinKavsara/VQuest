@@ -1,7 +1,5 @@
 # Ömer Said Karakuş'un REST API Metotları
-
-API Test Videosu: Link buraya eklenecek
-
+https://www.youtube.com/watch?v=Kkpk1ry7fTE
 ## Kimlik Doğrulama (Auth) & Profil İşlemleri
 
 1. Üye Olma (Kayıt)

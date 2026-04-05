@@ -16,8 +16,8 @@
 
 ## Proje Linkleri
 
-- **REST API Adresi:** [api.vquest.com](https://api.vquest.com)
-- **Web Frontend Adresi:** [frontend.vquest.com](https://frontend.vquest.com)
+- **REST API Adresi:** https://vquest-backend-api.onrender.com
+- **Web Frontend Adresi:** https://v-quest-frontend-deploy.vercel.app/
 
 ---
 
