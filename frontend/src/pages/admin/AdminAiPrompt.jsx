@@ -22,7 +22,10 @@ export default function AdminAiPrompt() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!promptText.trim()) return;
+    if (promptText.trim().length <= 10) {
+      toast.error('Prompt en az 10 karakter içermelidir');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -51,10 +54,11 @@ export default function AdminAiPrompt() {
               style={{ minHeight: 200, fontFamily: 'monospace', fontSize: '0.9rem', lineHeight: 1.6 }}
               value={promptText}
               onChange={e => setPromptText(e.target.value)}
+              placeholder="Örn: Kullanıcının güçlü ve zayıf yönlerini analiz et, Türkçe madde madde yaz..."
               required
             />
           </div>
-          <button className="btn btn-primary btn-full" type="submit" disabled={loading}>
+          <button className="btn btn-primary btn-full" type="submit" disabled={loading || promptText.trim().length <= 10}>
             {loading ? <><span className="spinner" /> Kaydediliyor...</> : '💾 Promptu Kaydet ve Güncelle'}
           </button>
         </form>
