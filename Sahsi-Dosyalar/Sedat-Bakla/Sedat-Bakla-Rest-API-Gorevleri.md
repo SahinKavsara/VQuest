@@ -1,6 +1,6 @@
 # Sedat Bakla'nın REST API Metotları
 
-API Test Videosu: Link buraya eklenecek
+https://youtu.be/WAqpfz2YD80
 
 ## Canlı Oyun Odaları (Game Rooms) Yönetimi
 
