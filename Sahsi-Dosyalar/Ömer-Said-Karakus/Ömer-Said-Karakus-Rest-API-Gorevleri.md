@@ -1,47 +1,80 @@
 # Ömer Said Karakuş'un REST API Metotları
-
-API Test Videosu: Link buraya eklenecek
+https://www.youtube.com/watch?v=Kkpk1ry7fTE
 
 ## Kimlik Doğrulama (Auth) & Profil İşlemleri
 
-1. Üye Olma (Kayıt)
+1.⁠ ⁠Üye Olma (Kayıt)
+•⁠  ⁠Endpoint: ⁠ POST /api/auth/register ⁠
+•⁠  ⁠Request Body:
+```json
+{
+  "username": "vdev_omer",
+  "email": "omer@vquest.com",
+  "password": "Sifre123!"
+}
+Authentication: Gerekmez
 
-* Endpoint: `POST /api/auth/register`
-* Request Body:
+Response: 201 Created - Kullanıcı başarıyla oluşturuldu ve veritabanına kaydedildi
 
-  ```json
-  {
-    "username": "vdev_omer",
-    "email": "omer@vquest.com",
-    "password": "Sifre123!"
-  }
-  ```
+Giriş Yapma (Login)
 
-* Authentication: Gerekmez
-* Response: `201 Created` - Kullanıcı başarıyla oluşturuldu ve veritabanına kaydedildi
+Endpoint: POST /api/auth/login
 
-2. Kullanıcı Bilgilerini (Profil) Görüntüleme
+Request Body:
 
-* Endpoint: `GET /api/profile`
-* Authentication: Bearer Token gerekli
-* Response: `200 OK` - Kullanıcı bilgileri (Kullanıcı adı, email ve skor) başarıyla getirildi
+JSON
+{
+  "email": "omer@vquest.com",
+  "password": "Sifre123!"
+}
+Authentication: Gerekmez
 
-3. Kullanıcı Bilgilerini (Şifre) Güncelleme
+Response: 200 OK - Başarıyla giriş yapıldı ve Bearer Token döndürüldü
 
-* Endpoint: `PUT /api/profile/password`
-* Request Body:
+Kullanıcı Bilgilerini (Profil) Görüntüleme
 
-  ```json
-  {
-    "newPassword": "YeniSifre456!"
-  }
-  ```
+Endpoint: GET /api/profile
 
-* Authentication: Bearer Token gerekli
-* Response: `200 OK` - Kullanıcı şifresi başarıyla güncellendi
+Authentication: Bearer Token gerekli
 
-4. Kullanıcı Silme
+Response: 200 OK - Kullanıcı bilgileri (Kullanıcı adı, email ve skor) başarıyla getirildi
 
-* Endpoint: `DELETE /api/profile`
-* Authentication: Bearer Token gerekli (Kendi hesabını silme yetkisi)
-* Response: `204 No Content` - Kullanıcı hesabı tüm verileriyle başarıyla silindi
+Kullanıcı Bilgilerini (Şifre) Güncelleme
+
+Endpoint: PUT /api/profile/password
+
+Request Body:
+
+JSON
+{
+  "oldPassword": "EskiSifre123!",
+  "newPassword": "YeniSifre456!"
+}
+Authentication: Bearer Token gerekli
+
+Response: 200 OK - Kullanıcı şifresi başarıyla güncellendi
+
+Hesap Silme
+
+Endpoint: DELETE /api/profile
+
+Authentication: Bearer Token gerekli (Kendi hesabını silme yetkisi)
+
+Response: 204 No Content - Kullanıcı hesabı tüm verileriyle başarıyla silindi
+
+Admin (Yönetici) İşlemleri
+Kullanıcı Listeleme
+
+Endpoint: GET /api/admin/users
+
+Authentication: Bearer Token gerekli (Sadece Admin yetkisi)
+
+Response: 200 OK - Tüm kullanıcıların listesi (aktiflik, puan, kayıt tarihi) başarıyla getirildi
+
+Kullanıcı Engelleme
+
+Endpoint: PUT /api/admin/users/:userId/block
+
+Authentication: Bearer Token gerekli (Sadece Admin yetkisi)
+
+Response: 200 OK - Kullanıcının sisteme girişi ve yarışmalara katılımı başarıyla engellendi
