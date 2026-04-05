@@ -1,5 +1,5 @@
 # Mustafa İsmail Toptaş'ın Web Frontend Görevleri
-Front-end Test Videosu: https://www.youtube.com/watch?v=usTNg_cH_GY
+Front-end Test Videosu: https://youtu.be/UQF71Jh23UI
 
 ### 1. Kullanıcı Kişisel Analiz (AI) Arayüzü
 **API Endpoint:** `POST /api/ai/analysis` | `GET /api/ai/reports/{reportId}`

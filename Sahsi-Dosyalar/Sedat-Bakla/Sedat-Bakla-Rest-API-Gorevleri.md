@@ -29,7 +29,7 @@ https://youtu.be/WAqpfz2YD80
 * Authentication: Bearer Token gerekli
 * Response: `200 OK` - Lobide bekleyen odalar listelendi
 
-3. Odaya Katılma (Açık Odalar)
+3. Odaya Katılma (Açık odalar)
 
 * Endpoint: `PUT /api/rooms/{roomId}/join`
 * Path Parameters:
