@@ -15,9 +15,8 @@ export default function RegisterPage() {
       await api.post('/auth/register', form);
       toast.success('Kayıt başarılı! Lütfen giriş yapın.');
       nav('/login');
-    } catch {
-      toast.success('Demo: Kayıt yapıldı varsayılarak login ekranına yönlendiriliyor');
-      nav('/login');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Kayıt başarısız. Lütfen bilgilerinizi kontrol edin.');
     } finally {
       setLoading(false);
     }
