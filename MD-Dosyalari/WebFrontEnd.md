@@ -1,6 +1,6 @@
 # Web Frontend Görev Dağılımı
 
-**Web Frontend Adresi:** [frontend.yazmuh.com](https://frontend.yazmuh.com)
+**Web Frontend Adresi:** [VQuest Frontend](https://v-quest-frontend-deploy.vercel.app/)
 
 Bu dokümanda, VQuest projesinin kullanıcı arayüzü (UI) ve kullanıcı deneyimi (UX) standartları, kullanılan teknoloji yığını ile ekip üyelerinin sorumluluk alanları listelenmektedir.
 
