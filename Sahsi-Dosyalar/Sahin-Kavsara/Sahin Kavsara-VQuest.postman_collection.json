@@ -1,0 +1,281 @@
+{
+  "info": {
+    "_postman_id": "d822fcf6-4fef-4c94-8a8c-a175b7f8672b",
+    "name": "VQuest",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50538942",
+    "_collection_link": "https://go.postman.co/collection/50538942-d822fcf6-4fef-4c94-8a8c-a175b7f8672b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Soru Paketi Olusturma",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZDI0Yjk1YzgzZjc5N2I2ODhlNWIzNSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NTM5MDU5MSwiZXhwIjoxNzc1OTk1MzkxfQ.8hOZ4b9r9Ag46KR3m0Mm0frRa9Ohu0SNseyYvFTxmm8",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Ana Anatomi Paketi\",\r\n  \"description\": \"Temel insan anatomisine dair önemli sorular\",\r\n  \"isPublic\": true,\r\n  \"questions\": [\r\n    \"69d25096c83f797b688e621a\"\r\n  ]\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://vquest-backend-api.onrender.com/api/packages",
+          "protocol": "https",
+          "host": [
+            "vquest-backend-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "packages"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Soru Paketi Listeleme",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZDI0Yjk1YzgzZjc5N2I2ODhlNWIzNSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NTM5MDU5MSwiZXhwIjoxNzc1OTk1MzkxfQ.8hOZ4b9r9Ag46KR3m0Mm0frRa9Ohu0SNseyYvFTxmm8",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://vquest-backend-api.onrender.com/api/packages",
+          "protocol": "https",
+          "host": [
+            "vquest-backend-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "packages"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Soru Paketi Güncelleme",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZDI0Yjk1YzgzZjc5N2I2ODhlNWIzNSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NTM5MDU5MSwiZXhwIjoxNzc1OTk1MzkxfQ.8hOZ4b9r9Ag46KR3m0Mm0frRa9Ohu0SNseyYvFTxmm8",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Ana Anatomi Paketi (Güncellendi)\",\r\n  \"description\": \"Açıklama başarıyla güncellendi...\",\r\n  \"isPublic\": false,\r\n  \"questions\": [\r\n    \"69d25096c83f797b688e621a\"\r\n  ]\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://vquest-backend-api.onrender.com/api/packages/69d26298c83f797b688e6e17",
+          "protocol": "https",
+          "host": [
+            "vquest-backend-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "packages",
+            "69d26298c83f797b688e6e17"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Soru Paketi Silme",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZDI0Yjk1YzgzZjc5N2I2ODhlNWIzNSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NTM5MDU5MSwiZXhwIjoxNzc1OTk1MzkxfQ.8hOZ4b9r9Ag46KR3m0Mm0frRa9Ohu0SNseyYvFTxmm8",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://vquest-backend-api.onrender.com/api/packages/69d26298c83f797b688e6e17",
+          "protocol": "https",
+          "host": [
+            "vquest-backend-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "packages",
+            "69d26298c83f797b688e6e17"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Yeni Soru Önerisi",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZDI0Yjk1YzgzZjc5N2I2ODhlNWIzNSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NTM5MDU5MSwiZXhwIjoxNzc1OTk1MzkxfQ.8hOZ4b9r9Ag46KR3m0Mm0frRa9Ohu0SNseyYvFTxmm8",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"questionText\": \"React kütüphanesinde durum yönetimi için hangi kanca (hook) kullanılır?\",\r\n  \"options\": [\r\n    \"useEffect\",\r\n    \"useState\",\r\n    \"useContext\",\r\n    \"useMemo\"\r\n  ],\r\n  \"correctAnswer\": \"useState\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://vquest-backend-api.onrender.com/api/suggestions",
+          "protocol": "https",
+          "host": [
+            "vquest-backend-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "suggestions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Önerilen Soruları Listeleme",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZDI0Yjk1YzgzZjc5N2I2ODhlNWIzNSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NTM5MDU5MSwiZXhwIjoxNzc1OTk1MzkxfQ.8hOZ4b9r9Ag46KR3m0Mm0frRa9Ohu0SNseyYvFTxmm8",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://vquest-backend-api.onrender.com/api/admin/suggestions",
+          "protocol": "https",
+          "host": [
+            "vquest-backend-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "admin",
+            "suggestions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Önerilen Soruyu Reddetme",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZDI0Yjk1YzgzZjc5N2I2ODhlNWIzNSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NTM5MDU5MSwiZXhwIjoxNzc1OTk1MzkxfQ.8hOZ4b9r9Ag46KR3m0Mm0frRa9Ohu0SNseyYvFTxmm8",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://vquest-backend-api.onrender.com/api/admin/suggestions/69d264d8c83f797b688e6ed4",
+          "protocol": "https",
+          "host": [
+            "vquest-backend-api",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "api",
+            "admin",
+            "suggestions",
+            "69d264d8c83f797b688e6ed4"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
