@@ -5,17 +5,17 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checking out source code...'
-                // VQuest repondan kodu çeker
-                git branch: 'main', url: 'https://github.com/SahinKavsara/VQuest.git'
+                // Manuel git komutu yerine, Jenkins'in bagli oldugu SCM ayarlarini kullanir
+                checkout scm
             }
         }
         
         stage('Build and Deploy') {
             steps {
                 echo 'Deploying locally using docker compose...'
-                // Eski çalışan konteynerleri durdurur ve temizler
+                // Eski calisan konteynerleri durdurur ve temizler
                 sh 'docker compose down'
-                // Yeni imajları derler ve arka planda çalıştırır
+                // Yeni imajlari derler ve arka planda calistirir
                 sh 'docker compose up -d --build'
             }
         }
@@ -26,10 +26,10 @@ pipeline {
                     echo 'Waiting for services to start...'
                     sleep 15
                     
-                    // Frontend Nginx portunun (80) ayakta olup olmadığını kontrol eder
+                    // Frontend Nginx portunun (80) ayakta olup olmadigini kontrol eder
                     sh 'curl -f http://localhost:80 || echo "Frontend henuz hazir degil"'
                     
-                    // Backend portunun (3000) ayakta olup olmadığını kontrol eder
+                    // Backend portunun (3000) ayakta olup olmadigini kontrol eder
                     sh 'curl -f http://localhost:3000 || echo "Backend henuz hazir degil"'
                 }
             }
