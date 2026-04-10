@@ -6,6 +6,13 @@
 
 ---
 
+## 7. CI/CD ve Docker Sunumu
+
+> **CI/CD & Docker Demo Videosu Linki:** [YouTube Docker sunum videosu linki buraya eklenecek](https://youtube.com)
+> *(Not: Bu video projenin Jenkins ile derlendiğini ve Docker üzerinde çalıştığını kanıtlayan, grupça ortak puan alacağınız kısımdır. Toplam 15 puan değerindedir.)*
+
+---
+
 ## Sunum Yapısı
 
 ### 1. Grup Lideri - Açılış Konuşması (1-2 dakika)
