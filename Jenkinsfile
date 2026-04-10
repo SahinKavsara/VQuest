@@ -13,13 +13,16 @@ pipeline {
         stage('Build and Deploy') {
             steps {
                 echo 'Deploying locally using docker compose...'
-                // Eski calisan konteynerleri durdurur ve temizler
+                // Daha önce silmeyi unuttuğumuz veya çakışan bir konteyner varsa Jenkins bunu halletsin:
+                sh 'docker rm -f vquest-mongo vquest-backend vquest-frontend || true'
+                
+                // Eski yapılandırmayı tamamen indir
                 sh 'docker compose down'
-                // Yeni imajlari derler ve arka planda calistirir
+                
+                // Yeni imajları derle ve tertemiz ayağa kaldır
                 sh 'docker compose up -d --build'
             }
         }
-
         stage('Health Check') {
             steps {
                 script {
