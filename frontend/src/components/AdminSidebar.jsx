@@ -9,7 +9,8 @@ export const AdminSidebar = () => {
     { name: 'Kullanıcılar', path: '/admin/users', icon: '👥' },
     { name: 'Odalar', path: '/admin/rooms', icon: '🚪' },
     { name: 'Duyurular', path: '/admin/notifications', icon: '📢' },
-    { name: 'AI Prompt', path: '/admin/ai-prompt', icon: '🤖' }
+    { name: 'AI Prompt', path: '/admin/ai-prompt', icon: '🤖' },
+    { name: 'Soru Önerileri', path: '/admin/suggestions', icon: '💡' }
   ];
 
   return (

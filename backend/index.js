@@ -1,11 +1,16 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
+import bcrypt from 'bcryptjs';
+import User from './src/models/User.js';
+import Category from './src/models/Category.js';
 import mongoose from 'mongoose';
 import connectDB from './src/config/db.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './src/config/swagger.js';
 import { createServer } from 'http';
 import { initSocket } from './src/services/socketService.js';
+import { generalLimiter } from './src/config/rateLimiter.js'; // Genel API rate limiter
 
 import aiRoutes from './src/routes/aiRoutes.js';
 import notifyRoutes from './src/routes/notifyRoutes.js';
@@ -20,13 +25,31 @@ import roomRoutes from './src/routes/roomRoutes.js';
 import adminRoutes from './src/routes/adminRoutes.js';
 
 const app = express();
+app.use(cors()); // Allow requests from local frontend (localhost:5173)
 const httpServer = createServer(app);
 initSocket(httpServer);
 
 connectDB();
 const port = process.env.PORT || 3000;
 
+// Env Check (Safe)
+if (!process.env.JWT_SECRET) {
+  console.error('❌ CRITICAL: JWT_SECRET is missing!');
+} else {
+  console.log('✅ JWT_SECRET is present (Length:', process.env.JWT_SECRET.length, ')');
+}
+
+// Redis Env Check
+if (!process.env.REDIS_URL) {
+  console.warn('⚠️  REDIS_URL tanımlanmadı. Varsayılan redis://localhost:6379 kullanılacak.');
+} else {
+  console.log('✅ REDIS_URL mevcut:', process.env.REDIS_URL);
+}
+
 app.use(express.json());
+
+// Genel API Rate Limiter — Tüm /api rotalarına uygulanır (1 dakikada maks 100 istek)
+app.use('/api', generalLimiter);
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
@@ -36,7 +59,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 
 // Basic Route
 app.get('/', (req, res) => {
-  res.json({ message: `VQuest Backend is running on port ${port}! Docs: http://localhost:${port}/api-docs` });
+  res.json({ message: `VQuest Backend is running on port ${port}! Docs: https://vquest-backend-api.onrender.com/api-docs` });
 });
 
 // API Routes
@@ -54,6 +77,26 @@ app.use('/api', roomRoutes);
 
 // Start the server
 httpServer.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-  console.log(`API Docs: http://localhost:${port}/api-docs`);
+  console.log(`Server is running at ${process.env.NODE_ENV === 'production' ? 'https://vquest-backend-api.onrender.com' : 'http://localhost:' + port}`);
+  console.log(`API Docs: https://vquest-backend-api.onrender.com/api-docs`);
+  
+  // Auto Seed Admin
+  const seedAdmin = async () => {
+    try {
+      const adminExists = await User.findOne({ role: 'admin' });
+      if (!adminExists) {
+        const hashedPassword = await bcrypt.hash('admin123', 10);
+        await User.create({
+          username: 'VQuestAdmin',
+          email: 'admin@vquest.com',
+          password: hashedPassword,
+          role: 'admin'
+        });
+        console.log('✅ Default Admin created: admin@vquest.com / admin123');
+      }
+    } catch (err) {
+      console.error('❌ Admin seeding failed:', err.message);
+    }
+  };
+  seedAdmin();
 });

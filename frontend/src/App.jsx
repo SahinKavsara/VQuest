@@ -15,6 +15,7 @@ import ProfilePage from './pages/ProfilePage';
 import PackagesPage from './pages/PackagesPage';
 import NotificationsPage from './pages/NotificationsPage';
 import AnalysisPage from './pages/AnalysisPage';
+import SuggestPage from './pages/SuggestPage';
 
 // Admin Pages
 
@@ -24,6 +25,7 @@ import AdminCategories from './pages/admin/AdminCategories';
 import AdminRooms from './pages/admin/AdminRooms';
 import AdminNotifications from './pages/admin/AdminNotifications';
 import AdminAiPrompt from './pages/admin/AdminAiPrompt';
+import AdminSuggestions from './pages/admin/AdminSuggestions';
 
 // Layout wrappers
 const UserLayout = ({ children }) => (
@@ -91,6 +93,7 @@ export default function App() {
         <Route path="/packages" element={<ProtectedRoute><UserLayout><PackagesPage /></UserLayout></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute><UserLayout><NotificationsPage /></UserLayout></ProtectedRoute>} />
         <Route path="/analysis" element={<ProtectedRoute><UserLayout><AnalysisPage /></UserLayout></ProtectedRoute>} />
+        <Route path="/suggest" element={<ProtectedRoute><UserLayout><SuggestPage /></UserLayout></ProtectedRoute>} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<ProtectedRoute adminOnly><AdminLayout><AdminQuestions /></AdminLayout></ProtectedRoute>} />
@@ -99,6 +102,7 @@ export default function App() {
         <Route path="/admin/rooms" element={<ProtectedRoute adminOnly><AdminLayout><AdminRooms /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/notifications" element={<ProtectedRoute adminOnly><AdminLayout><AdminNotifications /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/ai-prompt" element={<ProtectedRoute adminOnly><AdminLayout><AdminAiPrompt /></AdminLayout></ProtectedRoute>} />
+        <Route path="/admin/suggestions" element={<ProtectedRoute adminOnly><AdminLayout><AdminSuggestions /></AdminLayout></ProtectedRoute>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
