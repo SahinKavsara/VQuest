@@ -14,7 +14,7 @@ pipeline {
             steps {
                 echo 'Deploying locally using docker compose...'
                 // Daha önce silmeyi unuttuğumuz veya çakışan bir konteyner varsa Jenkins bunu halletsin:
-                sh 'docker rm -f vquest-mongo vquest-backend vquest-frontend || true'
+                sh 'docker rm -f vquest-mongo vquest-redis vquest-backend vquest-frontend || true'
                 
                 // Eski yapılandırmayı tamamen indir
                 sh 'docker compose down'
