@@ -53,22 +53,15 @@ pipeline {
         // ─── 5. DOCKER – BUILD & DEPLOY ───────────────────────────────────────
         stage('Docker Build and Deploy') {
             steps {
-                echo '🐳 Docker imajları derleniyor ve servisler başlatılıyor...'
-
-                // Çakışan konteynerleri temizle (hata verirse devam et)
-                bat 'docker rm -f vquest-backend vquest-frontend vquest-mongo vquest-redis 2>nul || echo Temizleme tamamlandi.'
-
-                // Eski stack'i indir
-                bat 'docker compose down --remove-orphans'
-
-                // İmajları yeniden derle ve başlat
-                bat 'docker compose up -d --build'
-
-                echo '✅ Tüm servisler başlatıldı.'
+                echo 'Deploying locally using docker compose...'
+                // Redis de temizlik listesine eklendi!
+                sh 'docker rm -f vquest-mongo vquest-backend vquest-frontend vquest-redis || true'
+                
+                sh 'docker compose down'
+                sh 'docker compose up -d --build'
             }
         }
-
-        // ─── 6. HEALTH CHECK ──────────────────────────────────────────────────
+ main
         stage('Health Check') {
             steps {
                 script {
