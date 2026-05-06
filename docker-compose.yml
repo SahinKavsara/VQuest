@@ -2,7 +2,6 @@
 services:
   backend:
     build: ./backend
-    container_name: vquest-backend
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -16,7 +15,6 @@ services:
 
   frontend:
     build: ./frontend
-    container_name: vquest-frontend
     restart: unless-stopped
     ports:
       - "80:80" # Nginx yayın portu
@@ -25,7 +23,6 @@ services:
 
   mongo:
     image: mongo:latest
-    container_name: vquest-mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
