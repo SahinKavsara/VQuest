@@ -1,7 +1,9 @@
 import { addQuestion, getAllQuestions, updateQuestion, deleteQuestion } from './services/redisDataService.js';
 
 async function runTests() {
-  console.log("=== REDIS SERVİS TESTİ BAŞLIYOR ===\n");
+  console.log("RabbitMQ bağlantısının kurulması için 1 saniye bekleniyor...");
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  console.log("\n=== REDIS SERVİS TESTİ BAŞLIYOR ===\n");
 
   // 1. Ekleme Testi
   console.log("1. Yeni Soru Ekleniyor...");
