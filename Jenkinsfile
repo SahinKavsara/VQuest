@@ -23,7 +23,7 @@ pipeline {
             steps {
                 echo '📦 Backend bağımlılıkları yükleniyor...'
                 dir('backend') {
-                    bat 'npm install'
+                    sh 'npm install'
                 }
             }
         }
@@ -33,8 +33,8 @@ pipeline {
             steps {
                 echo '🔨 Frontend derleniyor (Vite build)...'
                 dir('frontend') {
-                    bat 'npm install'
-                    bat 'npm run build'
+                    sh 'npm install'
+                    sh 'npm run build'
                 }
             }
         }
@@ -45,7 +45,7 @@ pipeline {
                 echo '🧪 Backend testleri çalıştırılıyor...'
                 dir('backend') {
                     // test scripti yoksa devam et
-                    bat 'echo Test scripti yok, başarılı sayılıyor.'
+                    sh 'echo Test scripti yok, başarılı sayılıyor.'
                 }
             }
         }
@@ -69,13 +69,13 @@ pipeline {
                     sleep 20
 
                     echo '🔍 Frontend (port 80) kontrol ediliyor...'
-                    bat 'curl -sf http://localhost:80 && echo Frontend AYAKTA || echo Frontend henuz hazir degil'
+                    sh 'curl -sf http://localhost:80 && echo Frontend AYAKTA || echo Frontend henuz hazir degil'
 
                     echo '🔍 Backend (port 3000) kontrol ediliyor...'
-                    bat 'curl -sf http://localhost:3000 && echo Backend AYAKTA || echo Backend henuz hazir degil'
+                    sh 'curl -sf http://localhost:3000 && echo Backend AYAKTA || echo Backend henuz hazir degil'
 
                     echo '🔍 Çalışan konteynerler:'
-                    bat 'docker compose ps'
+                    sh 'docker compose ps'
                 }
             }
         }
@@ -85,14 +85,14 @@ pipeline {
     post {
         always {
             echo '📋 Pipeline tamamlandı.'
-            bat 'docker compose ps || echo Docker compose durumu alinamadi.'
+            sh 'docker compose ps || echo Docker compose durumu alinamadi.'
         }
         success {
             echo '✅ PIPELINE BAŞARILI - VQuest Frontend (80) ve Backend (3000) Docker uzerinde calisiyor.'
         }
         failure {
             echo '❌ PIPELINE BAŞARISIZ - Logları kontrol et.'
-            bat 'docker compose logs --tail=30 || echo Log alinamadi.'
+            sh 'docker compose logs --tail=30 || echo Log alinamadi.'
         }
     }
 }
