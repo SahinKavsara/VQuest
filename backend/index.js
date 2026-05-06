@@ -8,8 +8,8 @@ import mongoose from 'mongoose';
 import connectDB from './src/config/db.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './src/config/swagger.js';
-import { createServer } from 'http';
-import { initSocket } from './src/services/socketService.js';
+import { initSocket, getIO } from './src/services/socketService.js';
+import { connectRabbit, consumeQueue } from './services/rabbitService.js';
 import { generalLimiter } from './src/config/rateLimiter.js'; // Genel API rate limiter
 
 import aiRoutes from './src/routes/aiRoutes.js';
@@ -99,4 +99,19 @@ httpServer.listen(port, () => {
     }
   };
   seedAdmin();
+
+  // RabbitMQ ve Consumer Başlatma
+  const startRabbit = async () => {
+    try {
+      await connectRabbit();
+      consumeQueue((data) => {
+        const io = getIO();
+        io.emit('newNotification', data);
+        console.log('📢 Bildirim kuyruktan alındı ve Socket.io ile gönderildi.');
+      });
+    } catch (err) {
+      console.error('❌ RabbitMQ başlatılamadı:', err.message);
+    }
+  };
+  startRabbit();
 });
