@@ -13,8 +13,13 @@ pipeline {
         stage('Build and Deploy') {
             steps {
                 echo 'Deploying locally using docker compose...'
+<<<<<<< emir
+                // Daha önce silmeyi unuttuğumuz veya çakışan bir konteyner varsa Jenkins bunu halletsin:
+                sh 'docker rm -f vquest-mongo vquest-redis vquest-backend vquest-frontend || true'
+=======
                 // Redis de temizlik listesine eklendi!
                 sh 'docker rm -f vquest-mongo vquest-backend vquest-frontend vquest-redis || true'
+>>>>>>> main
                 
                 sh 'docker compose down'
                 sh 'docker compose up -d --build'
