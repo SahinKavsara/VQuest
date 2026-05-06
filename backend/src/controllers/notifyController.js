@@ -1,6 +1,7 @@
 import Notification from '../models/Notification.js';
 import { getIO } from '../services/socketService.js';
 import redis from '../../services/redisService.js';
+import { sendToQueue } from '../../services/rabbitService.js';
 
 // @desc    Bildirim Gönderme
 // @route   POST /api/admin/notifications
@@ -17,8 +18,17 @@ export const sendNotification = async (req, res) => {
       message,
     });
 
-    // Socket.io ile anlık bildirim gönder (Tüm bağlı kullanıcılara)
+    // RabbitMQ ile kuyruğa gönder (Asenkron işleme)
     try {
+      await sendToQueue({
+        _id: notification._id,
+        message: notification.message,
+        isRead: false,
+        createdAt: notification.createdAt
+      });
+    } catch (rabbitErr) {
+      console.error('RabbitMQ send error:', rabbitErr.message);
+      // Fallback: RabbitMQ çalışmazsa doğrudan socket ile gönder
       const io = getIO();
       io.emit('newNotification', {
         _id: notification._id,
@@ -26,8 +36,6 @@ export const sendNotification = async (req, res) => {
         isRead: false,
         createdAt: notification.createdAt
       });
-    } catch (socketErr) {
-      console.error('Socket notification emit error:', socketErr.message);
     }
 
     // Redis önbelleğini temizle
