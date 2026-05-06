@@ -26,6 +26,7 @@ pipeline {
                 sh "docker compose -p ${PROJECT_NAME} up -d --build"
             }
         }
+        // aa
         stage('Health Check') {
             steps {
                 script {
