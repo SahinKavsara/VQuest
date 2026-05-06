@@ -5,6 +5,7 @@ import User from '../models/User.js';
 import mongoose from 'mongoose';
 import { getIO } from '../services/socketService.js';
 import redis from '../services/redisService.js';
+import { publishActivityLog } from '../services/rabbitmqService.js';
 
 // @desc    Oda Oluşturma (Madde 15)
 // @route   POST /api/rooms
@@ -190,6 +191,14 @@ export const joinRoom = async (req, res) => {
       await redis.zadd(`room:${room._id}:leaderboard`, 0, req.user._id.toString());
     }
 
+    // RabbitMQ'ya log gönder
+    publishActivityLog({
+      userId: req.user._id.toString(),
+      action: 'joined_room',
+      roomId: req.params.roomId,
+      timestamp: new Date().toISOString()
+    });
+
     res.status(200).json(room);
   } catch (error) {
     res.status(401).json({ message: error.message });
@@ -304,6 +313,14 @@ export const kickParticipant = async (req, res) => {
 
     room.participants.splice(participantIndex, 1);
     await room.save();
+
+    // RabbitMQ'ya log gönder
+    publishActivityLog({
+      userId: req.params.userId,
+      action: 'kicked_from_room',
+      roomId: req.params.roomId,
+      timestamp: new Date().toISOString()
+    });
 
     res.status(204).send();
   } catch (error) {

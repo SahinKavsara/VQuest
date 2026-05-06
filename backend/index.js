@@ -11,6 +11,7 @@ import swaggerSpec from './src/config/swagger.js';
 import { initSocket, getIO } from './src/services/socketService.js';
 import { connectRabbit, consumeQueue } from './services/rabbitService.js';
 import { generalLimiter } from './src/config/rateLimiter.js'; // Genel API rate limiter
+import { consumeActivityLogs } from './services/rabbitmqService.js';
 
 import aiRoutes from './src/routes/aiRoutes.js';
 import notifyRoutes from './src/routes/notifyRoutes.js';
@@ -30,6 +31,7 @@ const httpServer = createServer(app);
 initSocket(httpServer);
 
 connectDB();
+consumeActivityLogs();
 const port = process.env.PORT || 3000;
 
 // Env Check (Safe)
