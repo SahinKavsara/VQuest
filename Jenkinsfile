@@ -61,7 +61,7 @@ pipeline {
                 sh 'docker compose up -d --build'
             }
         }
- main
+
         stage('Health Check') {
             steps {
                 script {
