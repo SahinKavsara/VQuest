@@ -14,7 +14,7 @@ pipeline {
             steps {
                 echo '📥 Kaynak kod çekiliyor...'
                 checkout scm
-                echo "✅ Branch: ${env.GIT_BRANCH} | Commit: ${env.GIT_COMMIT?.take(7)}"
+                echo "✅ Kaynak kod alındı."
             }
         }
 
@@ -23,7 +23,7 @@ pipeline {
             steps {
                 echo '📦 Backend bağımlılıkları yükleniyor...'
                 dir('backend') {
-                    sh 'npm ci --prefer-offline || npm install'
+                    bat 'npm install'
                 }
             }
         }
@@ -33,8 +33,8 @@ pipeline {
             steps {
                 echo '🔨 Frontend derleniyor (Vite build)...'
                 dir('frontend') {
-                    sh 'npm ci --prefer-offline || npm install'
-                    sh 'npm run build'
+                    bat 'npm install'
+                    bat 'npm run build'
                 }
             }
         }
@@ -44,27 +44,25 @@ pipeline {
             steps {
                 echo '🧪 Backend testleri çalıştırılıyor...'
                 dir('backend') {
-                    // test scripti yoksa pipeline devam etsin
-                    sh 'npm test || echo "⚠️  Test scripti bulunamadı, atlanıyor."'
+                    // test scripti yoksa devam et
+                    bat 'npm test || echo Test scripti bulunamadi, atlaniyor.'
                 }
             }
         }
 
         // ─── 5. DOCKER – BUILD & DEPLOY ───────────────────────────────────────
-        stage('Docker Build & Deploy') {
+        stage('Docker Build and Deploy') {
             steps {
-                echo '🐳 Docker imajları derleniyor ve servisler ayağa kaldırılıyor...'
+                echo '🐳 Docker imajları derleniyor ve servisler başlatılıyor...'
 
-                // Çakışan konteynerleri temizle
-                sh '''
-                    docker rm -f vquest-backend vquest-frontend vquest-mongo vquest-redis 2>/dev/null || true
-                '''
+                // Çakışan konteynerleri temizle (hata verirse devam et)
+                bat 'docker rm -f vquest-backend vquest-frontend vquest-mongo vquest-redis 2>nul || echo Temizleme tamamlandi.'
 
-                // Eski stack'i tamamen indir
-                sh 'docker compose down --remove-orphans'
+                // Eski stack'i indir
+                bat 'docker compose down --remove-orphans'
 
-                // İmajları yeniden derle ve arka planda başlat
-                sh 'docker compose up -d --build'
+                // İmajları yeniden derle ve başlat
+                bat 'docker compose up -d --build'
 
                 echo '✅ Tüm servisler başlatıldı.'
             }
@@ -74,25 +72,17 @@ pipeline {
         stage('Health Check') {
             steps {
                 script {
-                    echo '⏳ Servislerin hazır olması bekleniyor (20 sn)...'
+                    echo '⏳ Servislerin hazır olması bekleniyor (20 saniye)...'
                     sleep 20
 
                     echo '🔍 Frontend (port 80) kontrol ediliyor...'
-                    sh '''
-                        curl -sf http://localhost:80 \
-                            && echo "✅ Frontend AYAKTA" \
-                            || echo "⚠️  Frontend henüz hazır değil"
-                    '''
+                    bat 'curl -sf http://localhost:80 && echo Frontend AYAKTA || echo Frontend henuz hazir degil'
 
                     echo '🔍 Backend (port 3000) kontrol ediliyor...'
-                    sh '''
-                        curl -sf http://localhost:3000 \
-                            && echo "✅ Backend AYAKTA" \
-                            || echo "⚠️  Backend henüz hazır değil"
-                    '''
+                    bat 'curl -sf http://localhost:3000 && echo Backend AYAKTA || echo Backend henuz hazir degil'
 
                     echo '🔍 Çalışan konteynerler:'
-                    sh 'docker compose ps'
+                    bat 'docker compose ps'
                 }
             }
         }
@@ -101,27 +91,15 @@ pipeline {
     // ─── POST ──────────────────────────────────────────────────────────────────
     post {
         always {
-            echo '📋 Pipeline tamamlandı. Log çıktıları aşağıda gösterilmektedir.'
-            sh 'docker compose ps || true'
+            echo '📋 Pipeline tamamlandı.'
+            bat 'docker compose ps || echo Docker compose durumu alinamadi.'
         }
         success {
-            echo '''
-            ╔══════════════════════════════════════════════╗
-            ║  ✅  PIPELINE BAŞARILI                        ║
-            ║  VQuest → Frontend (80) + Backend (3000)      ║
-            ║  Docker üzerinde çalışıyor.                   ║
-            ╚══════════════════════════════════════════════╝
-            '''
+            echo '✅ PIPELINE BAŞARILI - VQuest Frontend (80) ve Backend (3000) Docker uzerinde calisiyor.'
         }
         failure {
-            echo '''
-            ╔══════════════════════════════════════════════╗
-            ║  ❌  PIPELINE BAŞARISIZ                       ║
-            ║  Jenkins loglarını kontrol et.                ║
-            ╚══════════════════════════════════════════════╝
-            '''
-            // Hata durumunda konteynerlerin loglarını göster
-            sh 'docker compose logs --tail=50 || true'
+            echo '❌ PIPELINE BAŞARISIZ - Logları kontrol et.'
+            bat 'docker compose logs --tail=30 || echo Log alinamadi.'
         }
     }
 }
