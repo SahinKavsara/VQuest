@@ -4,8 +4,8 @@ import Package from '../models/Package.js';
 import User from '../models/User.js';
 import mongoose from 'mongoose';
 import { getIO } from '../services/socketService.js';
-import redis from '../services/redisService.js';
-import { publishActivityLog } from '../services/rabbitmqService.js';
+import redis from '../../services/redisService.js';
+import { publishActivityLog } from '../../services/rabbitmqService.js';
 
 // @desc    Oda Oluşturma (Madde 15)
 // @route   POST /api/rooms
