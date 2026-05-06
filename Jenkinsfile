@@ -23,8 +23,8 @@ pipeline {
             steps {
                 echo '📦 Backend bağımlılıkları yükleniyor (Docker Container içinde)...'
                 script {
-                    // Sadece bu bloğun içi 'node:18' ortamında çalışır, npm hatası çözülür
-                    docker.image('node:18-alpine').inside {
+                    // Sadece bu bloğun içi 'node:20' ortamında çalışır, npm hatası çözülür
+                    docker.image('node:20-alpine').inside {
                         dir('backend') {
                             sh 'npm install'
                         }
@@ -38,8 +38,8 @@ pipeline {
             steps {
                 echo '🔨 Frontend derleniyor (Docker Container içinde)...'
                 script {
-                    // Sadece bu bloğun içi 'node:18' ortamında çalışır
-                    docker.image('node:18-alpine').inside {
+                    // Sadece bu bloğun içi 'node:20' ortamında çalışır
+                    docker.image('node:20-alpine').inside {
                         dir('frontend') {
                             sh 'npm install'
                             sh 'npm run build'
