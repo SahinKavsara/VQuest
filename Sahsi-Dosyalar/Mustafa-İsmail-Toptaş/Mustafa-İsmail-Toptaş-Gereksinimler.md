@@ -26,6 +26,3 @@
     * **API Metodu:** DELETE
     * **Açıklama:** Kullanıcının geçmiş aylara ait, geçerliliğini yitirmiş veya artık görmek istemediği eski yapay zeka performans raporlarını kendi listesinden silmesini sağlar.
 
-8. **Bildirim Silme**
-    * **API Metodu:** DELETE
-    * **Açıklama:** Kullanıcının daha önce okuduğu ve bildirim kutusunda yer kaplamasını istemediği mesajları tek tek veya toplu olarak sistemden kaldırmasını sağlar.

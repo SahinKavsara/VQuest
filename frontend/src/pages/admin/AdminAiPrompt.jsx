@@ -1,16 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 export default function AdminAiPrompt() {
-  const [promptText, setPromptText] = useState(
-    'Kullanıcının performansını analiz et. Kategorilere göre zayıf ve güçlü yönlerini belirle ve motive edici tavsiyeler ver. Çıktı çok uzun olmasın, kolay okunabilir bir formatta olsun.'
-  );
+  const [promptText, setPromptText] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchPrompt = async () => {
+      try {
+        const { data } = await api.get('/admin/ai/prompt');
+        if (data && data.promptText) {
+          setPromptText(data.promptText);
+        }
+      } catch (err) {
+        toast.error('Mevcut prompt alınamadı');
+      }
+    };
+    fetchPrompt();
+  }, []);
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!promptText.trim()) return;
+    if (promptText.trim().length <= 10) {
+      toast.error('Prompt en az 10 karakter içermelidir');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -39,10 +54,11 @@ export default function AdminAiPrompt() {
               style={{ minHeight: 200, fontFamily: 'monospace', fontSize: '0.9rem', lineHeight: 1.6 }}
               value={promptText}
               onChange={e => setPromptText(e.target.value)}
+              placeholder="Örn: Kullanıcının güçlü ve zayıf yönlerini analiz et, Türkçe madde madde yaz..."
               required
             />
           </div>
-          <button className="btn btn-primary btn-full" type="submit" disabled={loading}>
+          <button className="btn btn-primary btn-full" type="submit" disabled={loading || promptText.trim().length <= 10}>
             {loading ? <><span className="spinner" /> Kaydediliyor...</> : '💾 Promptu Kaydet ve Güncelle'}
           </button>
         </form>

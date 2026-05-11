@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://vquest-backend-api.onrender.com',
         changeOrigin: true,
       }
     }

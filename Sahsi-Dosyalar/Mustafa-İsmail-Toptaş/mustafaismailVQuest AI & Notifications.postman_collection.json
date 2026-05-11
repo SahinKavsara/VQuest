@@ -1,0 +1,315 @@
+{
+  "info": {
+    "_postman_id": "8388c34a-b1fd-4818-861c-3c39215f8270",
+    "name": "VQuest AI & Notifications",
+    "description": "Mustafa İsmail Toptaş'ın REST API ödevi için hazırlanmış test koleksiyonu.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37433045"
+  },
+  "item": [
+    {
+      "name": "1. Yapay Zeka (AI) Algoritma ve Analiz Modülü",
+      "item": [
+        {
+          "name": "1. Kişisel Analiz Başlatma",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/analysis",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ai",
+                "analysis"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Analiz Sonucu Görüntüleme",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/reports/:reportId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ai",
+                "reports",
+                ":reportId"
+              ],
+              "variable": [
+                {
+                  "key": "reportId",
+                  "value": "RAPOR_ID_BURAYA"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Eski Analizleri Silme",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ai/reports/:reportId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ai",
+                "reports",
+                ":reportId"
+              ],
+              "variable": [
+                {
+                  "key": "reportId",
+                  "value": "RAPOR_ID_BURAYA"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Yapay Zeka Komutunu (Prompt) Güncelleme (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"promptText\": \"Kullanıcının güçlü ve zayıf yönlerini analiz et...\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/ai/prompt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "ai",
+                "prompt"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Sistem Bildirimleri (Notification) Modülü",
+      "item": [
+        {
+          "name": "5. Küresel Bildirim Gönderme (Admin)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Sistem yarın 02:00'da bakıma girecektir. İyi oyunlar!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "notifications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Gelen Bildirimleri Görüntüleme",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Bildirimi Okundu Olarak İşaretleme",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/:notifId/read",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                ":notifId",
+                "read"
+              ],
+              "variable": [
+                {
+                  "key": "notifId",
+                  "value": "BILDIRIM_ID_BURAYA"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8. Bildirim Silme",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/:notifId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                ":notifId"
+              ],
+              "variable": [
+                {
+                  "key": "notifId",
+                  "value": "BILDIRIM_ID_BURAYA"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "NORMAL_KULLANICI_TOKEN_BURAYA",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "ADMIN_TOKEN_BURAYA",
+      "type": "string"
+    }
+  ]
+}

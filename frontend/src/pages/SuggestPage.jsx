@@ -1,15 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
 export default function SuggestPage() {
+  const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
     text: '',
     options: ['', '', '', ''],
     correctIndex: 0,
-    category: 'Yazılım',
+    category: '',
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    api.get('/categories')
+      .then(res => {
+        setCategories(res.data);
+        if (res.data.length > 0) {
+          setForm(f => ({ ...f, category: res.data[0]._id }));
+        }
+      })
+      .catch(() => toast.error('Kategoriler yüklenemedi'));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,9 +36,14 @@ export default function SuggestPage() {
 
     setLoading(true);
     try {
-      await api.post('/suggestions', form);
+      await api.post('/suggestions', {
+        questionText: form.text,
+        options: form.options,
+        correctAnswer: form.options[form.correctIndex],
+        category: form.category
+      });
       toast.success('Soru öneriniz başarıyla gönderildi! Onay bekliyor.');
-      setForm({ text: '', options: ['', '', '', ''], correctIndex: 0, category: 'Yazılım' });
+      setForm(prev => ({ text: '', options: ['', '', '', ''], correctIndex: 0, category: prev.category }));
     } catch {
       toast.error('Öneri gönderilemedi');
     } finally {
@@ -67,8 +84,8 @@ export default function SuggestPage() {
               value={form.category}
               onChange={e => setForm({ ...form, category: e.target.value })}
             >
-              {['Yazılım', 'Tarih', 'Bilim', 'Coğrafya', 'Sanat', 'Spor', 'Genel Kültür'].map(c => (
-                <option key={c} value={c}>{c}</option>
+              {categories.map(c => (
+                <option key={c._id} value={c._id}>{c.name}</option>
               ))}
             </select>
           </div>

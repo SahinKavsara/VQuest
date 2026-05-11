@@ -3,6 +3,19 @@ import Notification from '../models/Notification.js';
 import SystemConfig from '../models/SystemConfig.js';
 import { generateAnalysis } from '../services/geminiServices.js';
 
+// @desc    Mevcut AI Promptu Getir
+// @route   GET /api/admin/ai/prompt
+// @access  Private/Admin
+export const getAiPrompt = async (req, res) => {
+  try {
+    const config = await SystemConfig.findOne({ key: 'AI_PROMPT' });
+    const promptText = config ? config.value : 'Kullanıcının bu oyundaki performansını analiz et ve SADECE 1 CÜMLELİK kısa bir tavsiye veya geri bildirim ver. Başka hiçbir şey yazma. Türkçe cevap ver.';
+    res.status(200).json({ promptText });
+  } catch (error) {
+    res.status(500).json({ message: 'Prompt alınamadı' });
+  }
+};
+
 // @desc    Kişisel Analiz Başlatma
 // @route   POST /api/ai/analysis
 // @access  Private
@@ -45,7 +58,14 @@ export const startAnalysis = async (req, res) => {
       console.log('AI Analysis Result:', analysisText);
     } catch (aiErr) {
       console.error('AI Error during generation:', aiErr);
-      return res.status(400).json({ message: 'Analiz oluşturulamadı' });
+      
+      // FALLBACK: AI çalışmazsa kullanıcıya boş dönmek yerine istatistiklerden basit rapor üretelim
+      const topCategory = Object.entries(stats).sort((a,b) => b[1].total - a[1].total)[0];
+      const categoryName = topCategory ? topCategory[0] : 'Genel';
+      const accuracy = topCategory ? Math.round((topCategory[1].correct / topCategory[1].total) * 100) : 0;
+      
+      analysisText = `${categoryName} kategorisindeki performansın %${accuracy} seviyesinde. ${accuracy > 70 ? 'Harika bir iş çıkardın, böyle devam et!' : 'Biraz daha pratik yaparak bu alanda kendini geliştirebilirsin.'}`;
+      console.log('Using Fallback Analysis:', analysisText);
     }
 
     const newAnalysis = await Analysis.create({
@@ -55,7 +75,8 @@ export const startAnalysis = async (req, res) => {
 
     res.status(202).json({
       _id: newAnalysis._id,
-      analysisText: newAnalysis.analysisText
+      analysisText: newAnalysis.analysisText,
+      createdAt: newAnalysis.createdAt
     });
 
   } catch (error) {
@@ -77,7 +98,8 @@ export const getReport = async (req, res) => {
 
     res.status(200).json({
       _id: report._id,
-      analysisText: report.analysisText
+      analysisText: report.analysisText,
+      createdAt: report.createdAt
     });
   } catch (error) {
     res.status(400).json({ message: 'Rapor getirilemedi' });
