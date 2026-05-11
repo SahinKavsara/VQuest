@@ -16,6 +16,7 @@ import { initSocket, getIO } from './src/services/socketService.js';
 import { connectRabbit, consumeQueue } from './services/rabbitService.js';
 import { generalLimiter } from './src/config/rateLimiter.js'; // Genel API rate limiter
 import { consumeActivityLogs } from './services/rabbitmqService.js';
+import { startAccountDeletionWorker } from './workers/accountDeletionWorker.js';
 
 import aiRoutes from './src/routes/aiRoutes.js';
 import notifyRoutes from './src/routes/notifyRoutes.js';
@@ -34,7 +35,7 @@ app.use(cors()); // Allow requests from local frontend (localhost:5173)
 const httpServer = createServer(app);
 initSocket(httpServer);
 
-connectDB();
+await connectDB();
 consumeActivityLogs();
 const port = process.env.PORT || 3000;
 
@@ -120,4 +121,8 @@ httpServer.listen(port, () => {
     }
   };
   startRabbit();
+
+  // Account Deletion Worker — account_deletion_queue'yu dinler
+  // Sunucu ile aynı process'te çalışır, ayrı terminal gerekmez
+  startAccountDeletionWorker();
 });
