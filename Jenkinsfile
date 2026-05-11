@@ -64,11 +64,11 @@ pipeline {
         stage('Docker Build and Deploy') {
             steps {
                 echo 'Deploying locally using docker compose...'
-                // Redis de temizlik listesine eklendi!
-                sh 'docker rm -f vquest-mongo vquest-backend vquest-frontend vquest-redis || true'
+                // Sadece app servislerini temizle (Jenkins'e KESİNLİKLE dokunma!)
+                sh 'docker rm -f vquest-mongo vquest-backend vquest-frontend vquest-redis vquest-rabbitmq-1 || true'
                 
-                sh 'docker compose down'
-                sh 'docker compose up -d --build'
+                // Belirli servisleri yeniden derle ve başlat (jenkins hariç)
+                sh 'docker compose up -d --build backend frontend mongo redis rabbitmq'
             }
         }
 
