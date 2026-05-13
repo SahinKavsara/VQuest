@@ -61,24 +61,19 @@ services:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
 
-  # Jenkins — CI/CD pipeline için, Docker socket ile Docker'a erişir
+  # Jenkins — CI/CD pipeline için
   jenkins:
-    build:
-      context: .
-      dockerfile: Dockerfile.jenkins
+    build: ./jenkins
     container_name: vquest-jenkins
     restart: unless-stopped
     ports:
-      - "8090:8080"   # 8080 zaten Windows Jenkins'te, çakışmamak için 8090
-      - "50000:50000" # Jenkins agent portu
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
+      - "8081:8080"   # Jenkins UI
+      - "50000:50000" # Jenkins agent bağlantı portu
     volumes:
-      - jenkins-data:/var/jenkins_home               # Jenkins verisini kalıcı tut
-      - /var/run/docker.sock:/var/run/docker.sock    # Docker socket — sh + docker komutları için
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock  # Host Docker daemon erişimi
     environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 
 volumes:
   mongo-data:
