@@ -29,6 +29,18 @@ services:
     depends_on:
       - backend
 
+  mobile:
+    build: ./mobile
+    container_name: vquest-mobile
+    restart: unless-stopped
+    ports:
+      - "19000:19000" # Expo Go portu
+    environment:
+      # Telefonun bilgisayarınıza bağlanabilmesi için Wi-Fi IP'nizi zorluyoruz
+      - REACT_NATIVE_PACKAGER_HOSTNAME=10.101.120.152
+    depends_on:
+      - backend
+
   mongo:
     image: mongo:latest
     container_name: vquest-mongo
