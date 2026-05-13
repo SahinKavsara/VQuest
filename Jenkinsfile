@@ -21,14 +21,11 @@ pipeline {
         // ─── 2. BACKEND – BAĞIMLILIK KURULUMU ─────────────────────────────────
         stage('Backend Install') {
             steps {
-                echo '📦 Backend bağımlılıkları yükleniyor (Docker Container içinde)...'
-                script {
-                    // Sadece bu bloğun içi 'node:20' ortamında çalışır, npm hatası çözülür
-                    docker.image('node:20-alpine').inside {
-                        dir('backend') {
-                            sh 'npm install'
-                        }
-                    }
+                echo '📦 Backend bağımlılıkları yükleniyor...'
+                // docker.image().inside kullanımı kaldırıldı (Docker Pipeline Plugin gerektiriyor)
+                // npm doğrudan Jenkins agent ortamında çalıştırılıyor
+                dir('backend') {
+                    sh 'npm install'
                 }
             }
         }
@@ -36,15 +33,11 @@ pipeline {
         // ─── 3. FRONTEND – BAĞIMLILIK KURULUMU & BUILD ────────────────────────
         stage('Frontend Build') {
             steps {
-                echo '🔨 Frontend derleniyor (Docker Container içinde)...'
-                script {
-                    // Sadece bu bloğun içi 'node:20' ortamında çalışır
-                    docker.image('node:20-alpine').inside {
-                        dir('frontend') {
-                            sh 'npm install'
-                            sh 'npm run build'
-                        }
-                    }
+                echo '🔨 Frontend derleniyor...'
+                // docker.image().inside kullanımı kaldırıldı (Docker Pipeline Plugin gerektiriyor)
+                dir('frontend') {
+                    sh 'npm install'
+                    sh 'npm run build'
                 }
             }
         }
