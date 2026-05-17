@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const SOCKET_URL = 'https://vquest-backend-api.onrender.com';
+const SOCKET_URL = 'http://10.101.120.200:5001';
 
 let _socket = null;
 
