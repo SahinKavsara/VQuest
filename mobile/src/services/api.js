@@ -40,7 +40,7 @@ export const setAuthStoreGetter = (getter) => {
  *  Docker'da frontend ile aynı network'te ise container adını da kullanabilirsiniz.
  *  Mobilde 'localhost' çalışmaz; gerçek IP veya ngrok adresi kullanın.
  */
-const BASE_URL = 'https://vquest-backend-api.onrender.com/api';
+const BASE_URL = 'http://10.101.120.200:5001/api';
 
 const api = axios.create({
   baseURL: BASE_URL,
