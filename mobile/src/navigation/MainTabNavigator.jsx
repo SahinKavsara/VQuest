@@ -13,6 +13,8 @@ import PackagesScreen from '../screens/main/PackagesScreen';
 
 // Admin screens
 import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen';
+import UsersScreen from '../screens/admin/UsersScreen';
+import QuestionsScreen from '../screens/admin/QuestionsScreen';
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
@@ -34,6 +36,8 @@ function AdminNavigator() {
     <AdminStack.Navigator screenOptions={{ headerShown: false }}>
       <AdminStack.Screen name="AdminDashboard" component={AdminDashboardScreen} />
       <AdminStack.Screen name="Packages" component={PackagesScreen} />
+      <AdminStack.Screen name="Users" component={UsersScreen} />
+      <AdminStack.Screen name="Questions" component={QuestionsScreen} />
     </AdminStack.Navigator>
   );
 }
