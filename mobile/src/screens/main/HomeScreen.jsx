@@ -12,9 +12,9 @@ import {
   Alert,
   RefreshControl,
   ActivityIndicator,
-  SafeAreaView,
   StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '../../services/api';
 
 // ── Renk Paleti ───────────────────────────────────────────────────────────────
@@ -247,6 +247,7 @@ export default function HomeScreen({ navigation }) {
           data={rooms}
           keyExtractor={item => item._id}
           contentContainerStyle={styles.list}
+          keyboardShouldPersistTaps="handled"
           renderItem={({ item }) => <RoomCard room={item} onJoin={joinRoom} />}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.primary} />}
           ListEmptyComponent={

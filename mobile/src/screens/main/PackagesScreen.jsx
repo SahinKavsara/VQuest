@@ -10,9 +10,9 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  SafeAreaView,
   StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '../../services/api';
 import useAuthStore from '../../store/useAuthStore';
 
@@ -135,6 +135,7 @@ export default function PackagesScreen() {
           data={packages}
           keyExtractor={item => item._id}
           contentContainerStyle={{ padding: 16 }}
+          keyboardShouldPersistTaps="handled"
           renderItem={renderPackage}
           ListEmptyComponent={
             <View style={styles.emptyState}>
@@ -157,7 +158,7 @@ export default function PackagesScreen() {
               </TouchableOpacity>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
               <Text style={styles.formLabel}>Paket Başlığı</Text>
               <TextInput
                 style={styles.formInput}

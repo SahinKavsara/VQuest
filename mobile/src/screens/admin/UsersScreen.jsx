@@ -6,10 +6,10 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
-  SafeAreaView,
   StatusBar,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '../../services/api';
 import useAuthStore from '../../store/useAuthStore';
 
@@ -143,6 +143,7 @@ export default function UsersScreen({ navigation }) {
           data={users}
           keyExtractor={(item) => item._id}
           contentContainerStyle={{ padding: 16 }}
+          keyboardShouldPersistTaps="handled"
           renderItem={renderUser}
           refreshing={loading}
           onRefresh={fetchUsers}

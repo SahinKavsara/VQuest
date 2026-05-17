@@ -7,10 +7,10 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-  SafeAreaView,
   StatusBar,
   FlatList,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '../../services/api';
 import socket from '../../services/socket';
 import useAuthStore from '../../store/useAuthStore';
@@ -88,7 +88,7 @@ function PlayingPhase({ question, questionIndex, totalQuestions, timeLeft, selec
   const progress = timeLeft / 15;
 
   return (
-    <View style={styles.playingContainer}>
+    <ScrollView contentContainerStyle={styles.playingContainer} keyboardShouldPersistTaps="handled">
       {/* Timer Bar */}
       <View style={styles.timerBarBg}>
         <View style={[styles.timerBarFill, { width: `${progress * 100}%`, backgroundColor: progress > 0.5 ? C.success : progress > 0.25 ? C.warning : C.primary }]} />
@@ -133,7 +133,7 @@ function PlayingPhase({ question, questionIndex, totalQuestions, timeLeft, selec
           </TouchableOpacity>
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   backBtn: { padding: 10, marginTop: 4 },
 
   // Playing
-  playingContainer: { flex: 1, padding: 16 },
+  playingContainer: { flexGrow: 1, padding: 16 },
   timerBarBg: { height: 6, backgroundColor: C.border, borderRadius: 3, marginBottom: 14, overflow: 'hidden' },
   timerBarFill: { height: '100%', borderRadius: 3 },
   questionMeta: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },

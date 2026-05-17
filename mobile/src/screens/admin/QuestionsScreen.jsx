@@ -6,10 +6,10 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
-  SafeAreaView,
   StatusBar,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '../../services/api';
 
 const C = {
@@ -119,6 +119,7 @@ export default function QuestionsScreen({ navigation }) {
           data={questions}
           keyExtractor={(item) => item._id}
           contentContainerStyle={{ padding: 16 }}
+          keyboardShouldPersistTaps="handled"
           renderItem={renderQuestion}
           refreshing={loading}
           onRefresh={fetchQuestions}

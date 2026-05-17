@@ -6,12 +6,11 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  SafeAreaView,
-  StatusBar,
   Alert,
   Modal,
   TextInput,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '../../services/api';
 import useAuthStore from '../../store/useAuthStore';
 import { useNavigation } from '@react-navigation/native';
