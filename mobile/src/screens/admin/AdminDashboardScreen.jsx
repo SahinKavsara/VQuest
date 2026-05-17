@@ -9,6 +9,8 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
+  Modal,
+  TextInput,
 } from 'react-native';
 import api from '../../services/api';
 import useAuthStore from '../../store/useAuthStore';
@@ -57,6 +59,10 @@ export default function AdminDashboardScreen() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [showNotifModal, setShowNotifModal] = useState(false);
+  const [notifMessage, setNotifMessage] = useState('');
+  const [sendingNotif, setSendingNotif] = useState(false);
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -79,10 +85,28 @@ export default function AdminDashboardScreen() {
     fetchStats();
   }, []);
 
+  const handleSendNotification = async () => {
+    if (!notifMessage.trim()) {
+      Alert.alert('Hata', 'Lütfen bir mesaj yazın.');
+      return;
+    }
+    setSendingNotif(true);
+    try {
+      await api.post('/admin/notifications', { message: notifMessage });
+      setShowNotifModal(false);
+      setNotifMessage('');
+      Alert.alert('Başarılı', 'Bildirim tüm kullanıcılara gönderildi.');
+    } catch (err) {
+      Alert.alert('Hata', 'Bildirim gönderilemedi.');
+    } finally {
+      setSendingNotif(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={C.bg} />
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 
         {/* Header */}
         <View style={styles.header}>
@@ -116,21 +140,21 @@ export default function AdminDashboardScreen() {
             emoji="❓"
             title="Sorular"
             subtitle="Tüm soruları görüntüle"
-            onPress={() => Alert.alert('Bilgi', 'Web admin panelinden yönetebilirsiniz.')}
+            onPress={() => navigation.navigate('Questions')}
           />
           <View style={styles.menuDivider} />
           <AdminMenuItem
             emoji="👥"
             title="Kullanıcılar"
             subtitle="Kullanıcı listesi ve yönetimi"
-            onPress={() => Alert.alert('Bilgi', 'Web admin panelinden yönetebilirsiniz.')}
+            onPress={() => navigation.navigate('Users')}
           />
           <View style={styles.menuDivider} />
           <AdminMenuItem
             emoji="🔔"
             title="Bildirim Gönder"
             subtitle="Tüm kullanıcılara duyuru yap"
-            onPress={() => Alert.alert('Bilgi', 'Web admin panelinden bildirim gönderebilirsiniz.')}
+            onPress={() => setShowNotifModal(true)}
           />
         </View>
 
@@ -151,6 +175,46 @@ export default function AdminDashboardScreen() {
         </View>
 
       </ScrollView>
+
+      {/* Bildirim Gönder Modal */}
+      <Modal visible={showNotifModal} animationType="slide" transparent onRequestClose={() => setShowNotifModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>🔔 Bildirim Gönder</Text>
+              <TouchableOpacity onPress={() => setShowNotifModal(false)}>
+                <Text style={{ color: C.muted, fontSize: 20 }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+              <Text style={styles.formLabel}>Duyuru Mesajı</Text>
+              <TextInput
+                style={[styles.formInput, { height: 100, textAlignVertical: 'top' }]}
+                placeholder="Kullanıcılara iletilecek mesajı yazın..."
+                placeholderTextColor={C.muted}
+                multiline
+                value={notifMessage}
+                onChangeText={setNotifMessage}
+              />
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowNotifModal(false)}>
+                  <Text style={{ color: C.muted, fontWeight: '600' }}>İptal</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.submitBtn, sendingNotif && { opacity: 0.6 }]}
+                  onPress={handleSendNotification}
+                  disabled={sendingNotif}
+                >
+                  {sendingNotif ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.submitBtnText}>Gönder</Text>}
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 }
@@ -178,4 +242,15 @@ const styles = StyleSheet.create({
   quickBtn: { flex: 1, backgroundColor: C.card, borderRadius: 14, padding: 18, alignItems: 'center', borderWidth: 1 },
   quickBtnEmoji: { fontSize: 28, marginBottom: 8 },
   quickBtnText: { fontSize: 13, fontWeight: '800' },
+  // Modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
+  modalBox: { backgroundColor: C.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, maxHeight: '90%' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  modalTitle: { fontSize: 18, fontWeight: '800', color: C.text },
+  formLabel: { fontSize: 12, color: C.muted, fontWeight: '700', marginBottom: 6, marginTop: 10 },
+  formInput: { backgroundColor: C.cardAlt, color: C.text, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, borderWidth: 1, borderColor: C.border, marginBottom: 20 },
+  modalActions: { flexDirection: 'row', gap: 10, paddingBottom: 10 },
+  cancelBtn: { flex: 1, backgroundColor: C.cardAlt, borderRadius: 10, paddingVertical: 13, alignItems: 'center', borderWidth: 1, borderColor: C.border },
+  submitBtn: { flex: 2, backgroundColor: C.primary, borderRadius: 10, paddingVertical: 13, alignItems: 'center' },
+  submitBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });

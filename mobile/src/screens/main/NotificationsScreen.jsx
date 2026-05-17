@@ -11,6 +11,7 @@ import {
   StatusBar,
 } from 'react-native';
 import api from '../../services/api';
+import socket from '../../services/socket';
 
 const C = {
   bg: '#1a1a2e',
@@ -39,7 +40,20 @@ export default function NotificationsScreen() {
     }
   };
 
-  useEffect(() => { fetchNotifications(); }, []);
+  useEffect(() => { 
+    fetchNotifications(); 
+
+    const s = socket.connect();
+    const handleNewNotif = (newNotif) => {
+      setNotifications(prev => [newNotif, ...prev]);
+    };
+
+    s.on('newNotification', handleNewNotif);
+
+    return () => {
+      s.off('newNotification', handleNewNotif);
+    };
+  }, []);
 
   const markRead = async (id) => {
     try {

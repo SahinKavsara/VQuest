@@ -202,9 +202,9 @@ export default function PackagesScreen() {
                   <Text style={{ color: C.muted, fontWeight: '600' }}>İptal</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.submitBtn, (creating || form.questions.length === 0) && { opacity: 0.6 }]}
+                  style={[styles.submitBtn, creating && { opacity: 0.6 }]}
                   onPress={handleCreate}
-                  disabled={creating || form.questions.length === 0}
+                  disabled={creating}
                 >
                   {creating ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.submitBtnText}>Oluştur</Text>}
                 </TouchableOpacity>

@@ -170,7 +170,12 @@ export default function HomeScreen({ navigation }) {
     }
     setCreating(true);
     try {
-      const { data } = await api.post('/rooms', form);
+      const payload = { ...form };
+      // Mongoose CastError hatasını önlemek için boş ObjectId yerine alanı temizle
+      if (!payload.packageId) delete payload.packageId;
+      if (!payload.category) delete payload.category;
+
+      const { data } = await api.post('/rooms', payload);
       setShowModal(false);
       setForm({ name: '', category: categories[0]?.name || '', packageId: '', maxParticipants: 10, duration: 30, isPublic: true, sourceType: 'ready', newQuestions: [] });
       navigation.navigate('GameRoom', { roomId: data._id });
@@ -265,7 +270,7 @@ export default function HomeScreen({ navigation }) {
               </TouchableOpacity>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
               {/* Oda Adı */}
               <Text style={styles.formLabel}>Oda Adı</Text>
               <TextInput
@@ -301,7 +306,7 @@ export default function HomeScreen({ navigation }) {
               {form.sourceType === 'ready' && (
                 <View>
                   <Text style={styles.formLabel}>Kategori Seç</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }} keyboardShouldPersistTaps="handled">
                     {categories.map(c => (
                       <TouchableOpacity
                         key={c._id}

@@ -187,7 +187,7 @@ function ResultPhase({ room, aiAnalysis, aiLoading, userId, onExit, onClose }) {
 // ── Ana Bileşen: GameRoomScreen ───────────────────────────────────────────────
 export default function GameRoomScreen({ route, navigation }) {
   const { roomId } = route.params;
-  const { userId } = useAuthStore();
+  const { userId, username } = useAuthStore();
 
   const [phase, setPhase] = useState('lobby'); // lobby | playing | result
   const [room, setRoom] = useState(null);
@@ -255,7 +255,8 @@ export default function GameRoomScreen({ route, navigation }) {
   useEffect(() => {
     fetchData();
     const s = socket.connect();
-    s.emit('joinRoom', { roomId, userId });
+    // Backend'in socket.on('joinRoom') beklentisine uygun olarak objeyi düzenledik
+    s.emit('joinRoom', { roomId, user: { _id: userId, username } });
 
     s.on('updateScoreboard', (participants) => {
       setRoom(prev => ({ ...prev, participants }));

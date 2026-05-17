@@ -40,19 +40,22 @@ export default function RegisterScreen({ navigation }) {
 
     setLoading(true);
     try {
-      const { data } = await api.post('/auth/register', {
+      await api.post('/auth/register', {
         username,
         email,
         password,
       });
 
-      // Başarılı kayıt → otomatik giriş yap
+      // Başarılı kayıt → otomatik giriş yapmak için login isteği at
+      const loginRes = await api.post('/auth/login', { email, password });
+      const { data } = loginRes;
+
       await login({
         token: data.token,
         userId: data.user._id ?? data.user.id,
         role: data.user.role ?? 'user',
         username: data.user.username,
-        score: 0,
+        score: data.user.score ?? 0,
       });
 
     } catch (error) {
