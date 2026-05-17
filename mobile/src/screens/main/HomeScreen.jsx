@@ -363,18 +363,35 @@ export default function HomeScreen({ navigation }) {
                         }}
                       />
                       {q.options.map((opt, oIdx) => (
-                        <TextInput
-                          key={oIdx}
-                          style={[styles.formInput, { marginTop: 4 }]}
-                          placeholder={`Şık ${String.fromCharCode(65 + oIdx)}`}
-                          placeholderTextColor={C.muted}
-                          value={opt}
-                          onChangeText={v => {
-                            const nq = [...form.newQuestions];
-                            nq[qIdx].options[oIdx] = v;
-                            setForm(f => ({ ...f, newQuestions: nq }));
-                          }}
-                        />
+                        <View key={oIdx} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                          <TouchableOpacity
+                            style={{ padding: 10, marginRight: 6 }}
+                            onPress={() => {
+                              const nq = [...form.newQuestions];
+                              nq[qIdx].correctAnswer = nq[qIdx].options[oIdx];
+                              setForm(f => ({ ...f, newQuestions: nq }));
+                            }}
+                          >
+                            <Text style={{ fontSize: 18, color: q.correctAnswer === opt && opt !== '' ? C.success : C.muted }}>
+                              {q.correctAnswer === opt && opt !== '' ? '☑' : '☐'}
+                            </Text>
+                          </TouchableOpacity>
+                          <TextInput
+                            style={[styles.formInput, { flex: 1, marginBottom: 0 }]}
+                            placeholder={`Şık ${String.fromCharCode(65 + oIdx)}`}
+                            placeholderTextColor={C.muted}
+                            value={opt}
+                            onChangeText={v => {
+                              const nq = [...form.newQuestions];
+                              // Doğru cevap olarak seçiliyse metnini güncelle
+                              if (nq[qIdx].correctAnswer === nq[qIdx].options[oIdx]) {
+                                nq[qIdx].correctAnswer = v;
+                              }
+                              nq[qIdx].options[oIdx] = v;
+                              setForm(f => ({ ...f, newQuestions: nq }));
+                            }}
+                          />
+                        </View>
                       ))}
                     </View>
                   ))}
