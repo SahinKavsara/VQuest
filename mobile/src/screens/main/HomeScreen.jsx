@@ -132,7 +132,7 @@ export default function HomeScreen({ navigation }) {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 5000);
+    const interval = setInterval(fetchData, 15000); // 15 Saniyede bir güncelle (Render'ı yormamak için)
     return () => clearInterval(interval);
   }, [fetchData]);
 
