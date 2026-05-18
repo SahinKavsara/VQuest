@@ -63,6 +63,18 @@ export default function AdminDashboardScreen() {
   const [notifMessage, setNotifMessage] = useState('');
   const [sendingNotif, setSendingNotif] = useState(false);
 
+  // Yapay Zeka Promptu State'leri
+  const [showPromptModal, setShowPromptModal] = useState(false);
+  const [aiPromptText, setAiPromptText] = useState('');
+  const [fetchingPrompt, setFetchingPrompt] = useState(false);
+  const [updatingPrompt, setUpdatingPrompt] = useState(false);
+
+  // Soru Önerileri State'leri
+  const [showSuggestionsModal, setShowSuggestionsModal] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [fetchingSuggestions, setFetchingSuggestions] = useState(false);
+  const [rejectingSuggestions, setRejectingSuggestions] = useState({});
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -101,6 +113,70 @@ export default function AdminDashboardScreen() {
     } finally {
       setSendingNotif(false);
     }
+  };
+
+  const openPromptEditor = async () => {
+    setShowPromptModal(true);
+    setFetchingPrompt(true);
+    try {
+      const { data } = await api.get('/admin/ai/prompt');
+      setAiPromptText(data.promptText || '');
+    } catch {
+      Alert.alert('Hata', 'Mevcut prompt yüklenemedi.');
+    } finally {
+      setFetchingPrompt(false);
+    }
+  };
+
+  const handleUpdatePrompt = async () => {
+    if (!aiPromptText.trim()) {
+      Alert.alert('Hata', 'Prompt alanı boş bırakılamaz.');
+      return;
+    }
+    setUpdatingPrompt(true);
+    try {
+      await api.put('/admin/ai/prompt', { promptText: aiPromptText.trim() });
+      setShowPromptModal(false);
+      Alert.alert('✅ Başarılı', 'Yapay zeka promptu güncellendi.');
+    } catch {
+      Alert.alert('Hata', 'Prompt güncellenemedi.');
+    } finally {
+      setUpdatingPrompt(false);
+    }
+  };
+
+  const openSuggestionsManager = async () => {
+    setShowSuggestionsModal(true);
+    setFetchingSuggestions(true);
+    try {
+      const { data } = await api.get('/admin/suggestions');
+      setSuggestions(Array.isArray(data) ? data : []);
+    } catch {
+      Alert.alert('Hata', 'Soru önerileri listesi alınamadı.');
+    } finally {
+      setFetchingSuggestions(false);
+    }
+  };
+
+  const handleRejectSuggestion = async (id) => {
+    Alert.alert('Onayla', 'Bu soru önerisini reddetmek ve silmek istediğinize emin misiniz?', [
+      { text: 'İptal', style: 'cancel' },
+      {
+        text: 'Reddet / Sil', style: 'destructive',
+        onPress: async () => {
+          setRejectingSuggestions(prev => ({ ...prev, [id]: true }));
+          try {
+            await api.delete(`/admin/suggestions/${id}`);
+            setSuggestions(prev => prev.filter(s => s._id !== id));
+            Alert.alert('✅ Başarılı', 'Öneri reddedildi ve silindi.');
+          } catch {
+            Alert.alert('Hata', 'Öneri silinemedi.');
+          } finally {
+            setRejectingSuggestions(prev => ({ ...prev, [id]: false }));
+          }
+        }
+      }
+    ]);
   };
 
   return (
@@ -155,6 +231,20 @@ export default function AdminDashboardScreen() {
             title="Bildirim Gönder"
             subtitle="Tüm kullanıcılara duyuru yap"
             onPress={() => setShowNotifModal(true)}
+          />
+          <View style={styles.menuDivider} />
+          <AdminMenuItem
+            emoji="🤖"
+            title="Yapay Zeka Komutu"
+            subtitle="AI promptunu ve analiz kriterlerini düzenle"
+            onPress={openPromptEditor}
+          />
+          <View style={styles.menuDivider} />
+          <AdminMenuItem
+            emoji="💡"
+            title="Soru Önerileri"
+            subtitle="Kullanıcıların soru önerilerini yönet"
+            onPress={openSuggestionsManager}
           />
         </View>
 
@@ -215,6 +305,121 @@ export default function AdminDashboardScreen() {
         </View>
       </Modal>
 
+      {/* Yapay Zeka Promptu Modal */}
+      <Modal visible={showPromptModal} animationType="slide" transparent onRequestClose={() => setShowPromptModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>🤖 Yapay Zeka Promptunu Düzenle</Text>
+              <TouchableOpacity onPress={() => setShowPromptModal(false)}>
+                <Text style={{ color: C.muted, fontSize: 20 }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {fetchingPrompt ? (
+              <View style={{ padding: 40, alignItems: 'center' }}>
+                <ActivityIndicator size="large" color={C.primary} />
+                <Text style={{ color: C.muted, marginTop: 12 }}>Prompt yükleniyor...</Text>
+              </View>
+            ) : (
+              <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+                <Text style={styles.formLabel}>Sistem Promptu</Text>
+                <TextInput
+                  style={[styles.formInput, { height: 180, textAlignVertical: 'top' }]}
+                  placeholder="Yapay zekanın analiz yaparken kullanacağı temel prompt talimatını girin..."
+                  placeholderTextColor={C.muted}
+                  multiline
+                  value={aiPromptText}
+                  onChangeText={setAiPromptText}
+                />
+
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowPromptModal(false)}>
+                    <Text style={{ color: C.muted, fontWeight: '600' }}>İptal</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.submitBtn, updatingPrompt && { opacity: 0.6 }]}
+                    onPress={handleUpdatePrompt}
+                    disabled={updatingPrompt}
+                  >
+                    {updatingPrompt ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.submitBtnText}>Kaydet</Text>}
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Soru Önerileri Modal */}
+      <Modal visible={showSuggestionsModal} animationType="slide" transparent onRequestClose={() => setShowSuggestionsModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>💡 Soru Önerileri ({suggestions.length})</Text>
+              <TouchableOpacity onPress={() => setShowSuggestionsModal(false)}>
+                <Text style={{ color: C.muted, fontSize: 20 }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {fetchingSuggestions ? (
+              <View style={{ padding: 40, alignItems: 'center' }}>
+                <ActivityIndicator size="large" color={C.primary} />
+                <Text style={{ color: C.muted, marginTop: 12 }}>Öneriler yükleniyor...</Text>
+              </View>
+            ) : (
+              <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+                {suggestions.length === 0 ? (
+                  <View style={{ padding: 40, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 48, marginBottom: 12 }}>💡</Text>
+                    <Text style={{ color: C.text, fontWeight: '700', fontSize: 16 }}>Soru önerisi bulunmuyor</Text>
+                    <Text style={{ color: C.muted, textAlign: 'center', marginTop: 4 }}>Kullanıcıların yeni soru önerileri burada listelenir.</Text>
+                  </View>
+                ) : (
+                  suggestions.map((item) => (
+                    <View key={item._id} style={styles.suggestionCard}>
+                      <View style={styles.suggestionHeader}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.suggestionUser}>👤 Gönderen: {item.user?.username || 'Bilinmeyen'}</Text>
+                          <Text style={styles.suggestionCategory}>🏷️ Kategori: {item.category?.name || 'Genel'}</Text>
+                        </View>
+                        <TouchableOpacity
+                          style={styles.suggestionRejectBtn}
+                          onPress={() => handleRejectSuggestion(item._id)}
+                          disabled={!!rejectingSuggestions[item._id]}
+                        >
+                          {rejectingSuggestions[item._id] ? (
+                            <ActivityIndicator size="small" color={C.primary} />
+                          ) : (
+                            <Text style={{ color: C.primary, fontSize: 12, fontWeight: '700' }}>🗑️ Reddet / Sil</Text>
+                          )}
+                        </TouchableOpacity>
+                      </View>
+                      <View style={styles.suggestionBody}>
+                        <Text style={styles.suggestionText}>{item.questionText}</Text>
+                        
+                        <View style={styles.suggestionOptions}>
+                          {item.options?.map((opt, oIdx) => {
+                            const letter = String.fromCharCode(65 + oIdx);
+                            const isCorrect = item.correctAnswer === opt;
+                            return (
+                              <View key={oIdx} style={[styles.suggestionOptionRow, isCorrect && styles.suggestionOptionRowCorrect]}>
+                                <Text style={[styles.suggestionOptionLetter, { color: isCorrect ? C.success : C.muted }]}>{letter})</Text>
+                                <Text style={[styles.suggestionOptionText, isCorrect && { color: C.success }]}>{opt}</Text>
+                              </View>
+                            );
+                          })}
+                        </View>
+                      </View>
+                    </View>
+                  ))
+                )}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 }
@@ -253,4 +458,17 @@ const styles = StyleSheet.create({
   cancelBtn: { flex: 1, backgroundColor: C.cardAlt, borderRadius: 10, paddingVertical: 13, alignItems: 'center', borderWidth: 1, borderColor: C.border },
   submitBtn: { flex: 2, backgroundColor: C.primary, borderRadius: 10, paddingVertical: 13, alignItems: 'center' },
   submitBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  // Soru Önerileri Stilleri
+  suggestionCard: { backgroundColor: C.cardAlt, borderRadius: 12, borderWidth: 1, borderColor: C.border, padding: 14, marginBottom: 12 },
+  suggestionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', borderBottomWidth: 1, borderBottomColor: C.border, paddingBottom: 8, marginBottom: 8 },
+  suggestionUser: { color: C.text, fontSize: 13, fontWeight: '700' },
+  suggestionCategory: { color: C.accent, fontSize: 11, fontWeight: '600', marginTop: 2 },
+  suggestionRejectBtn: { backgroundColor: 'rgba(233,69,96,0.1)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(233,69,96,0.2)' },
+  suggestionBody: { gap: 8 },
+  suggestionText: { color: C.text, fontSize: 14, fontWeight: '600', lineHeight: 20 },
+  suggestionOptions: { gap: 6, marginTop: 4 },
+  suggestionOptionRow: { flexDirection: 'row', alignItems: 'center', padding: 8, borderRadius: 8, backgroundColor: C.card, borderWidth: 1, borderColor: C.border, gap: 8 },
+  suggestionOptionRowCorrect: { borderColor: C.success, backgroundColor: 'rgba(34,197,94,0.08)' },
+  suggestionOptionLetter: { fontWeight: '800', fontSize: 12 },
+  suggestionOptionText: { color: C.text, fontSize: 13, fontWeight: '600' },
 });

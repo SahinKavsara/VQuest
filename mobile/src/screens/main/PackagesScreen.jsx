@@ -36,6 +36,9 @@ export default function PackagesScreen() {
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', isPublic: true, questions: [], newQuestions: [] });
 
+  // Paket düzenleme için state
+  const [editPackageId, setEditPackageId] = useState(null);
+
   const fetchData = async () => {
     try {
       const [pRes, qRes] = await Promise.all([
@@ -53,17 +56,41 @@ export default function PackagesScreen() {
 
   useEffect(() => { fetchData(); }, []);
 
-  const handleCreate = async () => {
+  const triggerEdit = (pkg) => {
+    setEditPackageId(pkg._id);
+    setForm({
+      title: pkg.title || '',
+      description: pkg.description || '',
+      isPublic: pkg.isPublic !== undefined ? pkg.isPublic : true,
+      questions: pkg.questions ? pkg.questions.map(q => typeof q === 'object' ? q._id : q) : [],
+      newQuestions: []
+    });
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setEditPackageId(null);
+    setForm({ title: '', description: '', isPublic: true, questions: [], newQuestions: [] });
+  };
+
+  const handleSave = async () => {
     if (!form.title.trim()) { Alert.alert('Hata', 'Paket başlığı zorunludur.'); return; }
     setCreating(true);
     try {
-      await api.post('/packages', form);
+      if (editPackageId) {
+        // Düzenleme modu
+        await api.put(`/packages/${editPackageId}`, form);
+        Alert.alert('✅', 'Paket güncellendi!');
+      } else {
+        // Oluşturma modu
+        await api.post('/packages', form);
+        Alert.alert('✅', 'Paket oluşturuldu!');
+      }
       await fetchData();
-      setShowModal(false);
-      setForm({ title: '', description: '', isPublic: true, questions: [], newQuestions: [] });
-      Alert.alert('✅', 'Paket oluşturuldu!');
+      closeModal();
     } catch {
-      Alert.alert('Hata', 'Paket oluşturulamadı.');
+      Alert.alert('Hata', editPackageId ? 'Paket güncellenemedi.' : 'Paket oluşturulamadı.');
     } finally {
       setCreating(false);
     }
@@ -102,9 +129,14 @@ export default function PackagesScreen() {
         <Text style={styles.pkgCount}>{item.questions?.length || 0} soru</Text>
       </View>
       {role === 'admin' && (
-        <TouchableOpacity style={styles.delBtn} onPress={() => handleDelete(item._id)}>
-          <Text style={{ fontSize: 16 }}>🗑️</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <TouchableOpacity style={[styles.delBtn, { backgroundColor: 'rgba(0,229,255,0.1)' }]} onPress={() => triggerEdit(item)}>
+            <Text style={{ fontSize: 16 }}>✏️</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.delBtn} onPress={() => handleDelete(item._id)}>
+            <Text style={{ fontSize: 16 }}>🗑️</Text>
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );
@@ -147,13 +179,13 @@ export default function PackagesScreen() {
         />
       )}
 
-      {/* Yeni Paket Modal */}
-      <Modal visible={showModal} animationType="slide" transparent onRequestClose={() => setShowModal(false)}>
+      {/* Yeni / Düzenle Paket Modal */}
+      <Modal visible={showModal} animationType="slide" transparent onRequestClose={closeModal}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>➕ Yeni Paket Oluştur</Text>
-              <TouchableOpacity onPress={() => setShowModal(false)}>
+              <Text style={styles.modalTitle}>{editPackageId ? '✏️ Paketi Düzenle' : '➕ Yeni Paket Oluştur'}</Text>
+              <TouchableOpacity onPress={closeModal}>
                 <Text style={{ color: C.muted, fontSize: 20 }}>✕</Text>
               </TouchableOpacity>
             </View>
@@ -199,15 +231,15 @@ export default function PackagesScreen() {
               </View>
 
               <View style={styles.modalActions}>
-                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={closeModal}>
                   <Text style={{ color: C.muted, fontWeight: '600' }}>İptal</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.submitBtn, creating && { opacity: 0.6 }]}
-                  onPress={handleCreate}
+                  onPress={handleSave}
                   disabled={creating}
                 >
-                  {creating ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.submitBtnText}>Oluştur</Text>}
+                  {creating ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.submitBtnText}>{editPackageId ? 'Kaydet' : 'Oluştur'}</Text>}
                 </TouchableOpacity>
               </View>
             </ScrollView>
