@@ -1,0 +1,328 @@
+{
+  "info": {
+    "_postman_id": "64a17293-e256-40a3-9bdb-fb6fcdbf3eab",
+    "name": "Emir Omrak - VQuest API Collection",
+    "description": "Collection created for Emir Omrak's REST API assignment. Includes Questions and Categories management endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = JSON.parse(responseBody);",
+                  "if(jsonData.token){",
+                  "    pm.collectionVariables.set(\"bearerToken\", jsonData.token);",
+                  "    console.log(\"Token automatically updated for the collection.\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@vquest.com\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login to get the Bearer Token. This script automatically saves the token to the 'bearerToken' collection variable."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Questions",
+      "item": [
+        {
+          "name": "1. Soruları Listeleme (GET)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "questions"
+              ]
+            },
+            "description": "Sistemdeki tüm soruların veya filtrelenen belirli bir kategoriye ait soruların getirilmesi."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Soru Ekleme (POST)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"JavaScript Event Loop nasıl çalışır?\",\n  \"options\": [\n    \"Senkron olarak her şeyi sırayla işler\",\n    \"Call stack boşaldığında Callback Queue'yi alır\",\n    \"Sadece asenkron işlemleri durdurur\",\n    \"Sadece istekleri yönetir\"\n  ],\n  \"correctAnswer\": \"Call stack boşaldığında Callback Queue'yi alır\",\n  \"category\": \"ENTER_CATEGORY_ID_HERE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "questions"
+              ]
+            },
+            "description": "Yeni bir sorunun ana soru havuzuna eklenerek sisteme kaydedilmesi."
+          },
+          "response": []
+        },
+        {
+          "name": "3. Soru Güncelleme (PUT)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"JavaScript Event Loop nasıl çalışır? (Güncel)\",\n  \"options\": [\n    \"Senkron olarak her şeyi sırayla işler\",\n    \"Call stack boşaldığında Callback Queue'yi alır\",\n    \"Sadece asenkron işlemleri durdurur\",\n    \"Sadece istekleri yönetir\"\n  ],\n  \"correctAnswer\": \"Call stack boşaldığında Callback Queue'yi alır\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/questions/{{questionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "questions",
+                "{{questionId}}"
+              ]
+            },
+            "description": "Havuzda kayıtlı olan bir sorunun içeriğinin, seçeneklerinin veya doğru cevabının düzenlenmesi."
+          },
+          "response": []
+        },
+        {
+          "name": "4. Soru Silme (DELETE)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/questions/{{questionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "questions",
+                "{{questionId}}"
+              ]
+            },
+            "description": "Hatalı veya güncelliğini yitirmiş mevcut bir sorunun havuzdan kalıcı olarak silinmesi."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "5. Kategori Listeleme (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ]
+            },
+            "description": "Sistemde oluşturulmuş tüm soru konu kategorilerinin kullanıcıya gösterilmesi."
+          },
+          "response": []
+        },
+        {
+          "name": "6. Kategori Ekleme (POST)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Coğrafya\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "categories"
+              ]
+            },
+            "description": "Soru havuzunu yapılandırmak ve soruları sınıflandırmak amacıyla sisteme yeni bir kategori tanımlanması."
+          },
+          "response": []
+        },
+        {
+          "name": "7. Kategori Güncelleme (PUT)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fiziki Coğrafya\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/categories/{{categoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "categories",
+                "{{categoryId}}"
+              ]
+            },
+            "description": "Sistemde halihazırda bulunan bir kategorinin isminin veya içeriğinin değiştirilmesi."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "bearerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "questionId",
+      "value": "ENTER_QUESTION_ID_HERE",
+      "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "ENTER_CATEGORY_ID_HERE",
+      "type": "string"
+    }
+  ]
+}
