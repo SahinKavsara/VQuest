@@ -22,7 +22,7 @@ export default function RegisterScreen({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const login = useAuthStore((s) => s.login);
+
 
   const handleRegister = async () => {
     if (!username.trim() || !email.trim() || !password.trim()) {
@@ -46,17 +46,10 @@ export default function RegisterScreen({ navigation }) {
         password,
       });
 
-      // Başarılı kayıt → otomatik giriş yapmak için login isteği at
-      const loginRes = await api.post('/auth/login', { email, password });
-      const { data } = loginRes;
-
-      await login({
-        token: data.token,
-        userId: data.user._id ?? data.user.id,
-        role: data.user.role ?? 'user',
-        username: data.user.username,
-        score: data.user.score ?? 0,
-      });
+      // Başarılı kayıt → giriş sayfasına yönlendir
+      Alert.alert('Başarılı', 'Hesabınız oluşturuldu. Lütfen giriş yapınız.', [
+        { text: 'Tamam', onPress: () => navigation.navigate('Login') }
+      ]);
 
     } catch (error) {
       const msg = error.response?.data?.message ?? 'Kayıt olunamadı. Lütfen tekrar deneyin.';
