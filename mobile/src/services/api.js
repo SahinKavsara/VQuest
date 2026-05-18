@@ -44,7 +44,7 @@ const BASE_URL = 'https://vquest-backend-api.onrender.com/api';
 
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 30000, // Render uyku modundan uyanırken 30 saniyeye kadar sürebilir
   headers: {
     'Content-Type': 'application/json',
   },

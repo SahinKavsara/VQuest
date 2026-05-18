@@ -74,13 +74,43 @@ const useAuthStore = create((set) => ({
 
   /**
    * loadToken — Uygulama başlarken SecureStore'dan token'ı okuyup store'a yükle.
+   * Token bulunursa backend'den kullanıcı bilgilerini (userId, role, username, score) çeker.
+   * Token geçersiz / süresi dolmuşsa otomatik olarak temizler.
    * App.js içinde useEffect ile çağrılmalıdır.
    */
   loadToken: async () => {
     try {
       const token = await SecureStore.getItemAsync('jwt_token');
       if (token) {
-        set({ token, isLoading: false });
+        // Token'ı hemen set et ki interceptor isteklere ekleyebilsin
+        set({ token });
+
+        try {
+          // Circular dependency'den kaçınmak için dynamic import
+          const { default: api } = await import('../services/api');
+          const { data } = await api.get('/profile');
+
+          set({
+            token,
+            userId: data._id,
+            role: data.role ?? 'user',
+            username: data.username,
+            score: data.score ?? 0,
+            isLoading: false,
+          });
+        } catch (profileError) {
+          // Token geçersiz veya süresi dolmuş (401) → temizle
+          console.warn('[AuthStore] Profil alınamadı, token temizleniyor:', profileError.message);
+          await SecureStore.deleteItemAsync('jwt_token');
+          set({
+            token: null,
+            userId: null,
+            role: 'user',
+            username: null,
+            score: 0,
+            isLoading: false,
+          });
+        }
       } else {
         set({ isLoading: false });
       }
