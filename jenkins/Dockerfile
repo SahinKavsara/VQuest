@@ -27,5 +27,8 @@ RUN groupadd -f docker && usermod -aG docker jenkins
 # Jenkins kullanıcısına geri dön
 USER jenkins
 
+# Jenkins Pipeline eklentilerini kur
+RUN jenkins-plugin-cli --plugins "blueocean docker-workflow workflow-aggregator git"
+
 # Sürümleri kontrol et (build sırasında log'a düşer)
 RUN node --version && npm --version
