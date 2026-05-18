@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '../../services/api';
 import socket from '../../services/socket';
 import useAuthStore from '../../store/useAuthStore';
+import * as SecureStore from 'expo-secure-store';
 
 // ── Renk Paleti ───────────────────────────────────────────────────────────────
 const C = {
@@ -318,6 +319,19 @@ export default function GameRoomScreen({ route, navigation }) {
           try {
             const { data } = await api.post('/ai/analysis', { performanceData: performanceLogRef.current });
             setAiAnalysis(data.analysisText);
+
+            // local geçmiş listesine kaydet
+            try {
+              const STORAGE_KEY = 'vquest_ai_report_ids';
+              const val = await SecureStore.getItemAsync(STORAGE_KEY);
+              const saved = val ? JSON.parse(val) : [];
+              if (data._id && !saved.includes(data._id)) {
+                const updated = [data._id, ...saved];
+                await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(updated));
+              }
+            } catch (storeErr) {
+              console.warn('[GameRoom] SecureStore kaydetme hatası:', storeErr);
+            }
           } catch {
             setAiAnalysis('Analiz tamamlanamadı.');
           } finally {

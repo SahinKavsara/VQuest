@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
   StatusBar,
+  Modal,
 } from 'react-native';
 import api from '../../services/api';
 import useAuthStore from '../../store/useAuthStore';
@@ -36,6 +37,17 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(false);
   const [pwLoading, setPwLoading] = useState(false);
 
+  // Soru önerisi için state'ler
+  const [categories, setCategories] = useState([]);
+  const [showSuggestModal, setShowSuggestModal] = useState(false);
+  const [suggestLoading, setSuggestLoading] = useState(false);
+  const [suggestForm, setSuggestForm] = useState({
+    questionText: '',
+    options: ['', '', '', ''],
+    correctAnswer: '',
+    category: ''
+  });
+
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
@@ -48,10 +60,60 @@ export default function ProfileScreen() {
         setLoading(false);
       }
     };
+
+    const fetchCategories = async () => {
+      try {
+        const { data } = await api.get('/categories');
+        setCategories(data);
+        if (data.length > 0) {
+          setSuggestForm(prev => ({ ...prev, category: data[0]._id }));
+        }
+      } catch (err) {
+        console.warn('[ProfileScreen] Kategoriler yüklenemedi:', err);
+      }
+    };
+
     fetchProfile();
+    fetchCategories();
   }, []);
 
   const p = profile || { username, role };
+
+  const handleSuggestSubmit = async () => {
+    if (!suggestForm.questionText.trim()) {
+      Alert.alert('Hata', 'Soru metni zorunludur.');
+      return;
+    }
+    if (suggestForm.options.some(opt => !opt.trim())) {
+      Alert.alert('Hata', 'Lütfen tüm şıkları doldurun.');
+      return;
+    }
+    if (!suggestForm.correctAnswer) {
+      Alert.alert('Hata', 'Lütfen doğru cevabı seçin.');
+      return;
+    }
+    setSuggestLoading(true);
+    try {
+      await api.post('/suggestions', {
+        questionText: suggestForm.questionText.trim(),
+        options: suggestForm.options.map(o => o.trim()),
+        correctAnswer: suggestForm.correctAnswer.trim(),
+        category: suggestForm.category || undefined
+      });
+      Alert.alert('✅ Başarılı', 'Soru öneriniz yönetici onayına gönderildi!');
+      setSuggestForm({
+        questionText: '',
+        options: ['', '', '', ''],
+        correctAnswer: '',
+        category: categories[0]?._id || ''
+      });
+      setShowSuggestModal(false);
+    } catch (err) {
+      Alert.alert('Hata', err.response?.data?.message || 'Soru önerisi gönderilemedi.');
+    } finally {
+      setSuggestLoading(false);
+    }
+  };
 
   const handlePasswordUpdate = async () => {
     if (newPassword.length < 6) {
@@ -126,7 +188,7 @@ export default function ProfileScreen() {
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statEmoji}>🏆</Text>
-            <Text style={styles.statValue}>{p.totalScore || 0}</Text>
+            <Text style={styles.statValue}>{p.score || 0}</Text>
             <Text style={styles.statLabel}>Toplam Puan</Text>
           </View>
           <View style={styles.statCard}>
@@ -171,6 +233,12 @@ export default function ProfileScreen() {
             <View style={styles.disabledInput}>
               <Text style={styles.disabledText}>{p.role || 'user'}</Text>
             </View>
+
+            {/* Soru Önerisi Yap */}
+            <TouchableOpacity style={[styles.primaryBtn, { marginTop: 12, backgroundColor: C.accent }]} onPress={() => setShowSuggestModal(true)}>
+              <Text style={[styles.primaryBtnText, { color: C.cardAlt }]}>💡 Soru Önerisi Yap</Text>
+            </TouchableOpacity>
+
             {/* Çıkış Yap */}
             <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
               <Text style={styles.logoutBtnText}>🚪 Çıkış Yap</Text>
@@ -215,6 +283,98 @@ export default function ProfileScreen() {
           </View>
         )}
 
+        {/* Soru Önerisi Modal */}
+        <Modal visible={showSuggestModal} animationType="slide" transparent onRequestClose={() => setShowSuggestModal(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>💡 Yeni Soru Öner</Text>
+                <TouchableOpacity onPress={() => setShowSuggestModal(false)}>
+                  <Text style={{ color: C.muted, fontSize: 20 }}>✕</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+                <Text style={styles.formLabel}>Soru Metni</Text>
+                <TextInput
+                  style={[styles.input, { height: 60, textAlignVertical: 'top' }]}
+                  placeholder="Sorulacak soruyu buraya yazın..."
+                  placeholderTextColor={C.muted}
+                  multiline
+                  value={suggestForm.questionText}
+                  onChangeText={v => setSuggestForm(f => ({ ...f, questionText: v }))}
+                />
+
+                <Text style={styles.formLabel}>Kategori Seç</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }} keyboardShouldPersistTaps="handled">
+                  {categories.map(c => (
+                    <TouchableOpacity
+                      key={c._id}
+                      style={[styles.chipBtn, suggestForm.category === c._id && styles.chipBtnActive]}
+                      onPress={() => setSuggestForm(f => ({ ...f, category: c._id }))}
+                    >
+                      <Text style={[styles.chipText, suggestForm.category === c._id && { color: C.primary }]}>
+                        {c.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+
+                <Text style={styles.formLabel}>Şıklar ve Doğru Cevap (Seçmek için harfe tıklayın)</Text>
+                {suggestForm.options.map((opt, oIdx) => {
+                  const letter = String.fromCharCode(65 + oIdx);
+                  const isCorrect = suggestForm.correctAnswer === opt && opt !== '';
+                  return (
+                    <View key={oIdx} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8, gap: 8 }}>
+                      <TouchableOpacity
+                        style={{ paddingHorizontal: 16, paddingVertical: 12, backgroundColor: isCorrect ? 'rgba(34,197,94,0.15)' : C.cardAlt, borderRadius: 10, borderWidth: 1, borderColor: isCorrect ? C.success : C.border }}
+                        onPress={() => {
+                          if (opt.trim()) {
+                            setSuggestForm(f => ({ ...f, correctAnswer: opt }));
+                          } else {
+                            Alert.alert('Hata', 'Lütfen önce bu şıkka ait bir içerik yazın.');
+                          }
+                        }}
+                      >
+                        <Text style={{ color: isCorrect ? C.success : C.muted, fontWeight: '800', fontSize: 14 }}>
+                          {isCorrect ? `✅ ${letter}` : letter}
+                        </Text>
+                      </TouchableOpacity>
+                      <TextInput
+                        style={[styles.input, { flex: 1, marginBottom: 0 }]}
+                        placeholder={`Şık ${letter} seçeneği...`}
+                        placeholderTextColor={C.muted}
+                        value={opt}
+                        onChangeText={v => {
+                          const nq = [...suggestForm.options];
+                          if (suggestForm.correctAnswer === nq[oIdx]) {
+                            setSuggestForm(f => ({ ...f, correctAnswer: v }));
+                          }
+                          nq[oIdx] = v;
+                          setSuggestForm(f => ({ ...f, options: nq }));
+                        }}
+                      />
+                    </View>
+                  );
+                })}
+
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowSuggestModal(false)}>
+                    <Text style={{ color: C.muted, fontWeight: '600' }}>İptal</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.submitBtn, suggestLoading && { opacity: 0.6 }]}
+                    onPress={handleSuggestSubmit}
+                    disabled={suggestLoading}
+                  >
+                    {suggestLoading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.submitBtnText}>Öneriyi Gönder</Text>}
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -258,4 +418,16 @@ const styles = StyleSheet.create({
   dangerText: { color: C.muted, fontSize: 13, lineHeight: 20, marginBottom: 16 },
   dangerBtn: { backgroundColor: 'rgba(255,82,82,0.15)', borderRadius: 12, paddingVertical: 14, alignItems: 'center', borderWidth: 1, borderColor: C.danger },
   dangerBtnText: { color: C.danger, fontWeight: '700', fontSize: 14 },
+  // Suggestion Modal Stilleri
+  chipBtn: { backgroundColor: C.cardAlt, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, marginRight: 8, borderWidth: 1, borderColor: C.border },
+  chipBtnActive: { borderColor: C.primary, backgroundColor: 'rgba(233,69,96,0.1)' },
+  chipText: { color: C.muted, fontSize: 13, fontWeight: '600' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
+  modalBox: { backgroundColor: C.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, maxHeight: '90%' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 },
+  modalTitle: { fontSize: 20, fontWeight: '800', color: C.text },
+  modalActions: { flexDirection: 'row', gap: 10, marginTop: 15, marginBottom: 10 },
+  cancelBtn: { flex: 1, backgroundColor: C.cardAlt, borderRadius: 10, paddingVertical: 13, alignItems: 'center', borderWidth: 1, borderColor: C.border },
+  submitBtn: { flex: 2, backgroundColor: C.primary, borderRadius: 10, paddingVertical: 13, alignItems: 'center' },
+  submitBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });
