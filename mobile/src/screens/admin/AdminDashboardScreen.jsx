@@ -213,6 +213,13 @@ export default function AdminDashboardScreen() {
           />
           <View style={styles.menuDivider} />
           <AdminMenuItem
+            emoji="🏷️"
+            title="Kategoriler"
+            subtitle="Soru kategorilerini listele, oluştur ve yönet"
+            onPress={() => navigation.navigate('Categories')}
+          />
+          <View style={styles.menuDivider} />
+          <AdminMenuItem
             emoji="❓"
             title="Sorular"
             subtitle="Tüm soruları görüntüle"
