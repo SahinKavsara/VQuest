@@ -97,3 +97,11 @@ API Test Videosu: https://drive.google.com/file/d/1ImDIuVVli9-kYcLQKjN0T3wrLm7B-
   * `suggestionId` (string, required) - Soru önerisi ID'si
 * Authentication: Bearer Token gerekli (Yönetici yetkisi gerekir)
 * Response: `204 No Content` - Soru önerisi başarıyla reddedildi ve silindi
+
+8. Önerilen Soruyu Kabul Etme (Onaylama)
+
+* İşlem Akışı: Yönetici bir öneriyi onayladığında, sistem bu önerideki verileri kalıcı soru havuzuna kaydeder ve ardından öneriler listesinden temizler. Bu işlem ardışık iki API çağrısıyla gerçekleştirilir:
+  1. **Soru Havuzuna Ekleme:** `POST /api/admin/questions` (Soru önerisindeki veriler body olarak gönderilerek yeni soru oluşturulur)
+  2. **Öneriyi Silme:** `DELETE /api/admin/suggestions/{suggestionId}` (Kabul edilen öneri listeden silinir)
+* Authentication: Bearer Token gerekli (Yönetici yetkisi gerekir)
+* Response: Birinci işlemden `201 Created`, ikinci işlemden `204 No Content` yanıtları alınır.

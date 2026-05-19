@@ -64,9 +64,14 @@ export default function ProfileScreen() {
     const fetchCategories = async () => {
       try {
         const { data } = await api.get('/categories');
-        setCategories(data);
-        if (data.length > 0) {
-          setSuggestForm(prev => ({ ...prev, category: data[0]._id }));
+        // Redis mongoId → _id normalizasyonu
+        const normalized = (Array.isArray(data) ? data : []).map(c => ({
+          ...c,
+          _id: c._id || c.mongoId || c.id,
+        }));
+        setCategories(normalized);
+        if (normalized.length > 0) {
+          setSuggestForm(prev => ({ ...prev, category: normalized[0]._id }));
         }
       } catch (err) {
         console.warn('[ProfileScreen] Kategoriler yüklenemedi:', err);

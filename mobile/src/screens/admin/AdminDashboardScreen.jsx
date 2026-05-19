@@ -74,6 +74,7 @@ export default function AdminDashboardScreen() {
   const [suggestions, setSuggestions] = useState([]);
   const [fetchingSuggestions, setFetchingSuggestions] = useState(false);
   const [rejectingSuggestions, setRejectingSuggestions] = useState({});
+  const [approvingSuggestions, setApprovingSuggestions] = useState({});
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -156,6 +157,37 @@ export default function AdminDashboardScreen() {
     } finally {
       setFetchingSuggestions(false);
     }
+  };
+
+  const handleApproveSuggestion = async (id) => {
+    const item = suggestions.find(s => s._id === id);
+    if (!item) return;
+    Alert.alert('Onayla', 'Bu soru önerisini kabul edip soru havuzuna eklemek istediğinize emin misiniz?', [
+      { text: 'İptal', style: 'cancel' },
+      {
+        text: 'Kabul Et',
+        onPress: async () => {
+          setApprovingSuggestions(prev => ({ ...prev, [id]: true }));
+          try {
+            // Öneriyi soru havuzuna ekle
+            await api.post('/admin/questions', {
+              text: item.questionText,
+              options: item.options,
+              correctAnswer: item.correctAnswer,
+              category: item.category?.name || item.category || 'Genel Kültür'
+            });
+            // Öneriyi sil
+            await api.delete(`/admin/suggestions/${id}`);
+            setSuggestions(prev => prev.filter(s => s._id !== id));
+            Alert.alert('✅ Başarılı', 'Öneri kabul edildi ve soru havuzuna eklendi!');
+          } catch {
+            Alert.alert('Hata', 'Öneri onaylanamadı.');
+          } finally {
+            setApprovingSuggestions(prev => ({ ...prev, [id]: false }));
+          }
+        }
+      }
+    ]);
   };
 
   const handleRejectSuggestion = async (id) => {
@@ -390,17 +422,6 @@ export default function AdminDashboardScreen() {
                           <Text style={styles.suggestionUser}>👤 Gönderen: {item.user?.username || 'Bilinmeyen'}</Text>
                           <Text style={styles.suggestionCategory}>🏷️ Kategori: {item.category?.name || 'Genel'}</Text>
                         </View>
-                        <TouchableOpacity
-                          style={styles.suggestionRejectBtn}
-                          onPress={() => handleRejectSuggestion(item._id)}
-                          disabled={!!rejectingSuggestions[item._id]}
-                        >
-                          {rejectingSuggestions[item._id] ? (
-                            <ActivityIndicator size="small" color={C.primary} />
-                          ) : (
-                            <Text style={{ color: C.primary, fontSize: 12, fontWeight: '700' }}>🗑️ Reddet / Sil</Text>
-                          )}
-                        </TouchableOpacity>
                       </View>
                       <View style={styles.suggestionBody}>
                         <Text style={styles.suggestionText}>{item.questionText}</Text>
@@ -416,6 +437,32 @@ export default function AdminDashboardScreen() {
                               </View>
                             );
                           })}
+                        </View>
+
+                        {/* Onayla / Reddet Butonları */}
+                        <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+                          <TouchableOpacity
+                            style={styles.suggestionApproveBtn}
+                            onPress={() => handleApproveSuggestion(item._id)}
+                            disabled={!!approvingSuggestions[item._id]}
+                          >
+                            {approvingSuggestions[item._id] ? (
+                              <ActivityIndicator size="small" color={C.success} />
+                            ) : (
+                              <Text style={{ color: C.success, fontSize: 12, fontWeight: '700' }}>✅ Onayla</Text>
+                            )}
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.suggestionRejectBtn}
+                            onPress={() => handleRejectSuggestion(item._id)}
+                            disabled={!!rejectingSuggestions[item._id]}
+                          >
+                            {rejectingSuggestions[item._id] ? (
+                              <ActivityIndicator size="small" color={C.primary} />
+                            ) : (
+                              <Text style={{ color: C.primary, fontSize: 12, fontWeight: '700' }}>🗑️ Reddet</Text>
+                            )}
+                          </TouchableOpacity>
                         </View>
                       </View>
                     </View>
@@ -470,7 +517,8 @@ const styles = StyleSheet.create({
   suggestionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', borderBottomWidth: 1, borderBottomColor: C.border, paddingBottom: 8, marginBottom: 8 },
   suggestionUser: { color: C.text, fontSize: 13, fontWeight: '700' },
   suggestionCategory: { color: C.accent, fontSize: 11, fontWeight: '600', marginTop: 2 },
-  suggestionRejectBtn: { backgroundColor: 'rgba(233,69,96,0.1)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(233,69,96,0.2)' },
+  suggestionApproveBtn: { flex: 1, backgroundColor: 'rgba(34,197,94,0.1)', paddingHorizontal: 10, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(34,197,94,0.2)', alignItems: 'center' },
+  suggestionRejectBtn: { flex: 1, backgroundColor: 'rgba(233,69,96,0.1)', paddingHorizontal: 10, paddingVertical: 10, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(233,69,96,0.2)', alignItems: 'center' },
   suggestionBody: { gap: 8 },
   suggestionText: { color: C.text, fontSize: 14, fontWeight: '600', lineHeight: 20 },
   suggestionOptions: { gap: 6, marginTop: 4 },

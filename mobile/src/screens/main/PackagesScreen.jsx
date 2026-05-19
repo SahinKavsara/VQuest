@@ -46,7 +46,12 @@ export default function PackagesScreen() {
         api.get('/questions').then(r => r.data).catch(() => []),
       ]);
       setPackages(Array.isArray(pRes) ? pRes : []);
-      setQuestions(Array.isArray(qRes) ? qRes : []);
+      // Redis mongoId → _id normalizasyonu (Redis sorularda _id yerine mongoId döner)
+      const normalized = (Array.isArray(qRes) ? qRes : []).map(q => ({
+        ...q,
+        _id: q._id || q.mongoId || q.id,
+      }));
+      setQuestions(normalized);
     } catch {
       setPackages([]); setQuestions([]);
     } finally {
@@ -212,22 +217,24 @@ export default function PackagesScreen() {
 
               <Text style={styles.formLabel}>Sorular ({form.questions.length} seçildi)</Text>
               <View style={styles.questionListBox}>
-                {questions.length === 0 ? (
-                  <Text style={{ color: C.muted, fontSize: 13, padding: 10 }}>Soru bulunamadı.</Text>
-                ) : (
-                  questions.map(q => (
-                    <TouchableOpacity
-                      key={q._id}
-                      style={[styles.qCheckRow, form.questions.includes(q._id) && styles.qCheckRowActive]}
-                      onPress={() => toggleQuestion(q._id)}
-                    >
-                      <Text style={[styles.qCheckBox, form.questions.includes(q._id) && { color: C.primary }]}>
-                        {form.questions.includes(q._id) ? '☑' : '☐'}
-                      </Text>
-                      <Text style={styles.qCheckText} numberOfLines={2}>{q.text}</Text>
-                    </TouchableOpacity>
-                  ))
-                )}
+                <ScrollView nestedScrollEnabled={true} showsVerticalScrollIndicator={true} keyboardShouldPersistTaps="handled">
+                  {questions.length === 0 ? (
+                    <Text style={{ color: C.muted, fontSize: 13, padding: 10 }}>Soru bulunamadı.</Text>
+                  ) : (
+                    questions.map(q => (
+                      <TouchableOpacity
+                        key={q._id}
+                        style={[styles.qCheckRow, form.questions.includes(q._id) && styles.qCheckRowActive]}
+                        onPress={() => toggleQuestion(q._id)}
+                      >
+                        <Text style={[styles.qCheckBox, form.questions.includes(q._id) && { color: C.primary }]}>
+                          {form.questions.includes(q._id) ? '☑' : '☐'}
+                        </Text>
+                        <Text style={styles.qCheckText} numberOfLines={2}>{q.text}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
               </View>
 
               <View style={styles.modalActions}>
@@ -274,7 +281,7 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: 18, fontWeight: '800', color: C.text },
   formLabel: { fontSize: 12, color: C.muted, fontWeight: '700', marginBottom: 6, marginTop: 10 },
   formInput: { backgroundColor: C.cardAlt, color: C.text, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, borderWidth: 1, borderColor: C.border, marginBottom: 4 },
-  questionListBox: { backgroundColor: C.cardAlt, borderRadius: 10, borderWidth: 1, borderColor: C.border, maxHeight: 200, overflow: 'hidden', marginBottom: 6 },
+  questionListBox: { backgroundColor: C.cardAlt, borderRadius: 10, borderWidth: 1, borderColor: C.border, maxHeight: 300, marginBottom: 6 },
   qCheckRow: { flexDirection: 'row', alignItems: 'center', padding: 10, borderBottomWidth: 1, borderBottomColor: C.border, gap: 8 },
   qCheckRowActive: { backgroundColor: 'rgba(233,69,96,0.08)' },
   qCheckBox: { fontSize: 18, color: C.muted, width: 22 },
