@@ -310,7 +310,7 @@ export default function HomeScreen({ navigation }) {
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }} keyboardShouldPersistTaps="handled">
                     {categories.map(c => (
                       <TouchableOpacity
-                        key={c._id}
+                        key={`cat_${c._id}`}
                         style={[styles.chipBtn, form.category === c.name && form.packageId === '' && styles.chipBtnActive]}
                         onPress={() => setForm(f => ({ ...f, category: c.name, packageId: '' }))}
                       >
@@ -321,7 +321,7 @@ export default function HomeScreen({ navigation }) {
                     ))}
                     {packages.map(p => (
                       <TouchableOpacity
-                        key={p._id}
+                        key={`pkg_${p._id}`}
                         style={[styles.chipBtn, form.packageId === p._id && styles.chipBtnActive]}
                         onPress={() => setForm(f => ({ ...f, packageId: p._id, category: '' }))}
                       >
