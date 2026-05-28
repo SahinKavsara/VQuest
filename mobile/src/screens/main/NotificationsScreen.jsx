@@ -9,9 +9,17 @@ import {
   ActivityIndicator,
   SafeAreaView,
   StatusBar,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import api from '../../services/api';
 import socket from '../../services/socket';
+
+// Android için LayoutAnimation etkinleştir
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const C = {
   bg: '#1a1a2e',
@@ -84,6 +92,14 @@ export default function NotificationsScreen() {
         onPress: async () => {
           try {
             await api.delete(`/notifications/${id}`);
+            // Fade-out animasyonu ile listeden kaldır (MD gereksinimi)
+            LayoutAnimation.configureNext(
+              LayoutAnimation.create(
+                300,
+                LayoutAnimation.Types.easeInEaseOut,
+                LayoutAnimation.Properties.opacity,
+              )
+            );
             setNotifications(prev => prev.filter(n => n._id !== id));
           } catch {
             Alert.alert('Hata', 'Bildirim silinemedi');
