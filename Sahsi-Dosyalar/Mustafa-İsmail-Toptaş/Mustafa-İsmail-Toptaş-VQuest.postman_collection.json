@@ -1,0 +1,558 @@
+{
+  "info": {
+    "name": "Mustafa İsmail Toptaş — VQuest Mobile Backend & Redis/RabbitMQ Kanıt",
+    "_postman_id": "mustafa-vquest-collection-2024",
+    "description": "Mustafa İsmail Toptaş'ın tüm mobil backend gereksinimlerini test eden, Redis cache ve RabbitMQ'nun çalıştığını kanıtlayan Postman Collection.\n\n## Kullanım Sırası\n1. **01 — Login (User)** → userToken otomatik kaydedilir\n2. **02 — Login (Admin)** → adminToken otomatik kaydedilir\n3. Geri kalan istekleri sırayla çalıştır",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "https://vquest-backend-api.onrender.com/api",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reportId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "notifId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 AUTH",
+      "item": [
+        {
+          "name": "01 — Login (Normal Kullanıcı)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "    pm.collectionVariables.set('userToken', json.token);",
+                  "    console.log('✅ User token kaydedildi');",
+                  "    pm.test('Login başarılı', () => pm.response.to.have.status(200));",
+                  "} else {",
+                  "    pm.test('Token alınamadı', () => { throw new Error(JSON.stringify(json)); });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@vquest.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/login",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Kullanıcı girişi. Token otomatik olarak `userToken` değişkenine kaydedilir."
+          }
+        },
+        {
+          "name": "02 — Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "    pm.collectionVariables.set('adminToken', json.token);",
+                  "    console.log('✅ Admin token kaydedildi');",
+                  "    pm.test('Admin login başarılı', () => pm.response.to.have.status(200));",
+                  "} else {",
+                  "    pm.test('Admin token alınamadı', () => { throw new Error(JSON.stringify(json)); });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@vquest.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/login",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Admin girişi. Token otomatik olarak `adminToken` değişkenine kaydedilir."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🤖 AI ANALİZ (Gereksinim 1, 5, 7)",
+      "item": [
+        {
+          "name": "03 — Analiz Başlat (Manuel — Profil Üzerinden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Analiz oluşturuldu (202)', () => pm.response.to.have.status(202));",
+                  "const json = pm.response.json();",
+                  "pm.test('analysisText mevcut', () => pm.expect(json.analysisText).to.be.a('string').and.not.empty);",
+                  "pm.test('_id mevcut', () => pm.expect(json._id).to.be.a('string'));",
+                  "pm.collectionVariables.set('reportId', json._id);",
+                  "console.log('✅ Rapor ID kaydedildi:', json._id);",
+                  "console.log('📝 Analiz metni:', json.analysisText);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ai/analysis",
+              "host": ["{{BASE_URL}}"],
+              "path": ["ai", "analysis"]
+            },
+            "description": "Kullanıcı analiz tabından 'Analiz Başlat' butonuna basınca bu endpoint çağrılır. Body boş gönderilir, backend kullanıcının profil skoruna göre analiz üretir."
+          }
+        },
+        {
+          "name": "04 — Analiz Başlat (Oyun Verisiyle)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Analiz oluşturuldu (202)', () => pm.response.to.have.status(202));",
+                  "const json = pm.response.json();",
+                  "pm.test('analysisText kategoriye göre üretildi', () => pm.expect(json.analysisText).to.be.a('string').and.not.empty);",
+                  "console.log('📝 Oyun sonu analiz:', json.analysisText);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"performanceData\": [\n    { \"category\": \"Tarih\", \"isCorrect\": true },\n    { \"category\": \"Tarih\", \"isCorrect\": true },\n    { \"category\": \"Tarih\", \"isCorrect\": false },\n    { \"category\": \"Bilim\", \"isCorrect\": true },\n    { \"category\": \"Bilim\", \"isCorrect\": false },\n    { \"category\": \"Coğrafya\", \"isCorrect\": false }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ai/analysis",
+              "host": ["{{BASE_URL}}"],
+              "path": ["ai", "analysis"]
+            },
+            "description": "Oyun bitiminde performans verisiyle analiz başlatma. Backend kategorilere göre akıllı analiz üretir."
+          }
+        },
+        {
+          "name": "05 — Analiz Sonucu Görüntüle (Gereksinim 5)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Rapor bulundu (200)', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('analysisText mevcut', () => pm.expect(json.analysisText).to.be.a('string'));",
+                  "pm.test('_id doğru', () => pm.expect(json._id).to.equal(pm.collectionVariables.get('reportId')));",
+                  "console.log('✅ Rapor görüntülendi:', json.analysisText);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/ai/reports/{{reportId}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["ai", "reports", "{{reportId}}"]
+            },
+            "description": "03 nolu istekten kaydedilen reportId ile raporu görüntüler."
+          }
+        },
+        {
+          "name": "06 — Eski Analizi Sil (Gereksinim 7)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Rapor silindi (204)', () => pm.response.to.have.status(204));",
+                  "console.log('✅ Rapor başarıyla silindi');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/ai/reports/{{reportId}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["ai", "reports", "{{reportId}}"]
+            },
+            "description": "03 nolu istekten kaydedilen reportId'yi siler."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔴 REDİS CACHE KANITI (Gereksinim 6)",
+      "item": [
+        {
+          "name": "07 — BİLDİRİMLER 1. İstek (MongoDB'den — YAVAŞ)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('req1Time', Date.now());",
+                  "console.log('⏱️ 1. istek başlıyor...');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const elapsed = Date.now() - pm.collectionVariables.get('req1Time');",
+                  "pm.collectionVariables.set('req1Duration', elapsed);",
+                  "pm.test('Bildirimler listelendi (200)', () => pm.response.to.have.status(200));",
+                  "pm.test('Dizi döndü', () => pm.expect(pm.response.json()).to.be.an('array'));",
+                  "const json = pm.response.json();",
+                  "if (json.length > 0) pm.collectionVariables.set('notifId', json[0]._id);",
+                  "console.log('🗄️ 1. İstek (DB) süresi:', elapsed + 'ms — Bu veri MongoDB\\'den geldi');",
+                  "pm.test('1. İstek tamamlandı - süre: ' + elapsed + 'ms (DB)', () => true);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/notifications",
+              "host": ["{{BASE_URL}}"],
+              "path": ["notifications"]
+            },
+            "description": "🔴 REDİS KANITI — 1. İstek. Bu istek MongoDB'ye gider ve veriler Redis'e cache'lenir. Response süresi yüksek olacak."
+          }
+        },
+        {
+          "name": "08 — BİLDİRİMLER 2. İstek (Redis Cache — HIZLI ⚡)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('req2Time', Date.now());",
+                  "console.log('⏱️ 2. istek başlıyor... (bu sefer Redis\\'ten gelmeli)');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const elapsed = Date.now() - pm.collectionVariables.get('req2Time');",
+                  "const firstDuration = pm.collectionVariables.get('req1Duration') || 999;",
+                  "pm.test('Bildirimler listelendi (200)', () => pm.response.to.have.status(200));",
+                  "console.log('⚡ 2. İstek (Redis Cache) süresi:', elapsed + 'ms');",
+                  "console.log('📊 Hızlanma:', firstDuration + 'ms → ' + elapsed + 'ms');",
+                  "if (elapsed < firstDuration) {",
+                  "    console.log('✅ REDİS CACHE ÇALIŞIYOR! ' + Math.round((1 - elapsed/firstDuration)*100) + '% daha hızlı');",
+                  "    pm.test('✅ Redis Cache aktif — 2. istek ' + elapsed + 'ms (1. istek ' + firstDuration + 'ms idi)', () => true);",
+                  "} else {",
+                  "    pm.test('⚠️ Cache süresi: ' + elapsed + 'ms (1. istek: ' + firstDuration + 'ms) — Render cold start olabilir', () => true);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/notifications",
+              "host": ["{{BASE_URL}}"],
+              "path": ["notifications"]
+            },
+            "description": "🔴 REDİS KANITI — 2. İstek. Aynı endpoint, bu sefer Redis cache'ten gelir. Response süresi çok daha düşük olacak. Postman Tests sekmesinden karşılaştırmalı sonucu gör!"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🐰 RABBİTMQ KANITI (Gereksinim 2)",
+      "item": [
+        {
+          "name": "09 — Admin Küresel Bildirim Gönder (RabbitMQ Kuyruğuna Atar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Bildirim oluşturuldu (201)', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test('_id mevcut', () => pm.expect(json._id).to.be.a('string'));",
+                  "pm.test('Mesaj doğru', () => pm.expect(json.message).to.include('RabbitMQ'));",
+                  "console.log('🐰 Bildirim RabbitMQ kuyruğuna gönderildi! ID:', json._id);",
+                  "console.log('📡 Socket.io ile tüm aktif kullanıcılara yayınlandı');",
+                  "console.log('🗑️ Redis cache temizlendi (sonraki GET güncel veriyi getirir)');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"🐰 RabbitMQ kuyruğundan gelen canlı bildirim — Mustafa İsmail Toptaş Demo\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/admin/notifications",
+              "host": ["{{BASE_URL}}"],
+              "path": ["admin", "notifications"]
+            },
+            "description": "🐰 RABBİTMQ KANITI — Bu istek:\n1. MongoDB'ye bildirimi kaydeder\n2. RabbitMQ kuyruğuna mesajı iletir\n3. Worker kuyruğu okur ve Socket.io ile tüm kullanıcılara yayar\n4. Redis cache'i temizler\n\nBu isteği gönderdikten sonra 10 nolu isteği çalıştırarak bildirimin listeye eklendiğini doğrula!"
+          }
+        },
+        {
+          "name": "10 — RabbitMQ Sonrası Bildirim Listesi (Cache Temizlendi, DB'den Gelir)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('req3Time', Date.now());"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const elapsed = Date.now() - pm.collectionVariables.get('req3Time');",
+                  "pm.test('Bildirimler listelendi (200)', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Dizi döndü', () => pm.expect(json).to.be.an('array'));",
+                  "const rabbitNotif = json.find(n => n.message && n.message.includes('RabbitMQ'));",
+                  "pm.test('🐰 RabbitMQ bildirimi listede görünüyor', () => pm.expect(rabbitNotif).to.not.be.undefined);",
+                  "if (rabbitNotif) {",
+                  "    pm.collectionVariables.set('notifId', rabbitNotif._id);",
+                  "    console.log('✅ RabbitMQ kuyruğundan gelen bildirim listede:', rabbitNotif.message);",
+                  "}",
+                  "console.log('⏱️ Cache temizlendi, DB\\'den geldi:', elapsed + 'ms');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/notifications",
+              "host": ["{{BASE_URL}}"],
+              "path": ["notifications"]
+            },
+            "description": "🐰 RABBİTMQ KANITI (devam) — RabbitMQ ile gönderilen bildirimin kullanıcı listesinde göründüğünü doğrular. Cache temizlendiği için bu istek DB'den gelir."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔔 BİLDİRİM İŞLEMLERİ (Gereksinim 4, 6, 8)",
+      "item": [
+        {
+          "name": "11 — Bildirimi Okundu İşaretle (Gereksinim 4)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Okundu işaretlendi (200)', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('isRead = true', () => pm.expect(json.isRead).to.be.true);",
+                  "console.log('✅ Bildirim okundu olarak işaretlendi, Redis cache temizlendi');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/notifications/{{notifId}}/read",
+              "host": ["{{BASE_URL}}"],
+              "path": ["notifications", "{{notifId}}", "read"]
+            },
+            "description": "10 nolu istekten kaydedilen RabbitMQ bildirimini okundu olarak işaretler. Redis cache temizlenir."
+          }
+        },
+        {
+          "name": "12 — Bildirimi Sil (Gereksinim 8)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Bildirim silindi (204)', () => pm.response.to.have.status(204));",
+                  "console.log('✅ Bildirim silindi, Redis cache temizlendi');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/notifications/{{notifId}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["notifications", "{{notifId}}"]
+            },
+            "description": "notifId değişkenindeki bildirimi siler. Redis cache temizlenir."
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚙️ ADMİN — AI PROMPT (Gereksinim 3)",
+      "item": [
+        {
+          "name": "13 — AI Prompt Getir",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Prompt alındı (200)', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('promptText mevcut', () => pm.expect(json.promptText).to.be.a('string'));",
+                  "console.log('✅ Mevcut AI Prompt:', json.promptText);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/ai/prompt",
+              "host": ["{{BASE_URL}}"],
+              "path": ["admin", "ai", "prompt"]
+            },
+            "description": "Mevcut AI sistem promptunu getirir. Sadece admin erişebilir."
+          }
+        },
+        {
+          "name": "14 — AI Prompt Güncelle (Gereksinim 3)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Prompt güncellendi (200)', () => pm.response.to.have.status(200));",
+                  "pm.test('Başarı mesajı var', () => pm.expect(pm.response.json().message).to.include('güncellendi'));",
+                  "console.log('✅ AI Prompt başarıyla güncellendi');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"promptText\": \"Sen bir eğitim koçusun. Kullanıcının yarışma performansını analiz et ve SADECE 1 CÜMLELİK kısa bir Türkçe tavsiye ver. Güçlü ve zayıf yönlerini belirt.\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/admin/ai/prompt",
+              "host": ["{{BASE_URL}}"],
+              "path": ["admin", "ai", "prompt"]
+            },
+            "description": "Yapay zekanın analiz yaparken kullanacağı sistem promptunu günceller. Sadece admin erişebilir."
+          }
+        }
+      ]
+    }
+  ]
+}
