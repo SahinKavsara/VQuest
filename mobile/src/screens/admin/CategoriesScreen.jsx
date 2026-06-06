@@ -7,7 +7,6 @@ import {
   FlatList,
   ActivityIndicator,
   StatusBar,
-  Alert,
   Modal,
   TextInput,
 } from 'react-native';
@@ -162,52 +161,17 @@ export default function CategoriesScreen({ navigation }) {
     }
   };
 
-  const handleDeleteCategory = (cat) => {
-    Alert.alert(
-      'Kategoriyi Sil',
-      `"${cat.name}" kategorisini silmek istediğine emin misin?`,
-      [
-        { text: 'İptal', style: 'cancel' },
-        {
-          text: 'Sil',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await handlePromiseToast(
-                api.delete(`/admin/categories/${cat._id}`),
-                'Kategori siliniyor... ⏳',
-                'Kategori başarıyla silindi! 🗑️',
-                'Kategori silinemedi.'
-              );
-              setCategories((prev) => prev.filter((c) => c._id !== cat._id));
-            } catch (error) {
-              console.error('[CategoriesScreen] silme hatası:', error.message);
-            }
-          },
-        },
-      ]
-    );
-  };
-
   const renderCategory = ({ item }) => (
     <View style={styles.catCard}>
       <View style={{ flex: 1 }}>
         <Text style={styles.catName}>🏷️ {item.name}</Text>
       </View>
-      <View style={{ flexDirection: 'row', gap: 8 }}>
-        <TouchableOpacity
-          style={styles.editBtn}
-          onPress={() => handleOpenEditModal(item)}
-        >
-          <Text style={styles.editBtnText}>Düzenle</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.deleteBtn}
-          onPress={() => handleDeleteCategory(item)}
-        >
-          <Text style={styles.deleteBtnText}>Sil</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={styles.editBtn}
+        onPress={() => handleOpenEditModal(item)}
+      >
+        <Text style={styles.editBtnText}>Düzenle</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -376,8 +340,6 @@ const styles = StyleSheet.create({
   catName: { fontSize: 15, fontWeight: '700', color: C.text },
   editBtn: { backgroundColor: 'rgba(0,229,255,0.15)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
   editBtnText: { color: C.accent, fontSize: 12, fontWeight: '700' },
-  deleteBtn: { backgroundColor: 'rgba(239,68,68,0.15)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
-  deleteBtnText: { color: C.danger, fontSize: 12, fontWeight: '700' },
 
   emptyState: { alignItems: 'center', paddingTop: 80 },
   emptyIcon: { fontSize: 56, marginBottom: 16 },
