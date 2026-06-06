@@ -1,179 +1,107 @@
-# Mustafa İsmail Toptaş'ın Mobil Backend (REST API Bağlantısı) Görevleri
+# Mustafa İsmail Toptaş'ın Mobil Backend Görevleri
+**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** [Link buraya eklenecek](https://example.com)
 
-**Modül:** Yapay Zeka (AI) Analiz + Sistem Bildirimleri  
-**API Base URL:** `https://vquest-backend-api.onrender.com/api`  
-**Mobil Ekran Dosyaları:** `AnalysisScreen.jsx`, `NotificationsScreen.jsx`, `AdminDashboardScreen.jsx`
+## 1. Kişisel Analiz Başlatma Servisi
+- **API Endpoint:** `POST /api/ai/analysis`
+- **Görev:** Mobil uygulamada kullanıcının oynadığı oyunlardaki performansı baz alarak yapay zeka aracılığıyla kişisel analiz raporu oluşturmasını sağlayan servis entegrasyonu.
+- **İşlevler:**
+  - Kullanıcının performans verilerini toplama
+  - API'ye POST isteği gönderme (başarısızlık durumunda fallback mekanizması kullanımı)
+  - Yeni oluşturulan raporun ID'sini SecureStore'a (lokal depolama) kaydetme
+  - Spam koruması olarak 10 saniyelik cooldown mekanizması uygulama
+- **Teknik Detaylar:**
+  - Axios HTTP Client kullanımı (`api.js` interceptor ile 30s timeout)
+  - Authentication header ekleme (Bearer Token otomatik eklentisi)
+  - 202 Accepted durum kodu yönetimi
+  - Error handling ve kullanıcı bildirimleri (Alert)
 
----
+## 2. Analiz Sonucu Görüntüleme Servisi
+- **API Endpoint:** `GET /api/ai/reports/{reportId}`
+- **Görev:** Kullanıcının geçmiş performanslarına dair yapay zeka analiz raporlarını sistemden çekip görüntülemesini sağlayan servis entegrasyonu.
+- **İşlevler:**
+  - SecureStore'da saklanan rapor ID'lerini kullanarak her bir raporu tek tek fetch etme
+  - Gelen veriyi parse edip UI'da Modal içerisinde scrollable text olarak gösterme
+  - Yükleme (loading) sırasında activity indicator gösterme
+- **Teknik Detaylar:**
+  - Path parametresi kullanımı (reportId)
+  - `Promise.all` ile paralel istek yönetimi
+  - Authentication header ekleme (Bearer Token)
+  - Empty state (boş durum) gösterimi
 
-## 1. Kişisel Analiz Başlatma
+## 3. Eski Analizleri Silme Servisi
+- **API Endpoint:** `DELETE /api/ai/reports/{reportId}`
+- **Görev:** Kullanıcının artık görmek istemediği veya geçmişteki AI analiz raporlarını kalıcı olarak silmesini sağlayan servis entegrasyonu.
+- **İşlevler:**
+  - Silme işleminden önce kullanıcıya onay (confirm) dialog'u gösterme
+  - API'ye DELETE isteği gönderme
+  - Başarılı silme sonrasında ilgili rapor ID'sini SecureStore'dan ve liste state'inden çıkarma
+  - Toplu silme (Tümünü Sil) özelliği sağlama
+- **Teknik Detaylar:**
+  - Path parametresi kullanımı
+  - Optimistic UI update ve list state yönetimi
+  - Authentication header ekleme (Bearer Token)
+  - Destructive action için onay dialog yönetimi
 
-**Endpoint:** `POST /api/ai/analysis`  
-**Sorumlu Ekran:** `AnalysisScreen.jsx` + `GameRoomScreen.jsx`  
-**Authentication:** Bearer Token gerekli  
+## 4. Yapay Zeka Komutu Güncelleme Servisi (Admin)
+- **API Endpoint:** `GET /api/admin/ai/prompt` & `PUT /api/admin/ai/prompt`
+- **Görev:** Admin yetkisine sahip kullanıcıların, yapay zekanın analiz yaparken kullanacağı temel komutları (prompt) görüntülemesi ve güncellemesini sağlayan servis entegrasyonu.
+- **İşlevler:**
+  - Sayfa yüklendiğinde mevcut prompt bilgisini GET isteğiyle çekme
+  - Admin tarafından düzenlenen yeni promptu validasyon işleminden (boşluk kontrolü) geçirme
+  - API'ye PUT isteği ile yeni promptu gönderme
+  - Güncelleme sırasında "Yükleniyor" durumuna geçiş ve sonuç bildirimleri
+- **Teknik Detaylar:**
+  - Admin yetki kontrolü ve Authentication header ekleme (Bearer Token)
+  - String validasyonu (`trim()` kontrolü)
+  - Error handling ve kullanıcı geri bildirimleri
 
-**Mobil Uygulama:**
-```js
-// GameRoomScreen.jsx — oyun bitişinde performans verisiyle çağrılır
-const { data } = await api.post('/ai/analysis', {
-  performanceData: performanceLogRef.current // [{ category, isCorrect, question }]
-});
+## 5. Küresel Bildirim Gönderme Servisi (Admin)
+- **API Endpoint:** `POST /api/admin/notifications`
+- **Görev:** Yönetici yetkisine sahip kullanıcıların, sistemdeki tüm kullanıcılara eşzamanlı olarak duyuru/bildirim göndermesini sağlayan servis entegrasyonu.
+- **İşlevler:**
+  - Admin panelinden bildirim metnini toplama ve form validasyonu uygulama
+  - API'ye POST isteği ile mesajı iletme
+  - İşlem başarılı olduğunda form alanını temizleme ve Alert ile bilgilendirme
+- **Teknik Detaylar:**
+  - Authentication header ekleme (Bearer Token)
+  - Backend tarafında RabbitMQ ile mesaj kuyruğuna alınması ve Socket.io ile canlı yayınlanması (Backend işlevi)
+  - Redis cache temizleme tetikleyicisi
 
-// AnalysisScreen.jsx — manuel başlatmada (boş body, fallback çalışır)
-const { data } = await api.post('/ai/analysis');
-```
+## 6. Gelen Bildirimleri Görüntüleme Servisi
+- **API Endpoint:** `GET /api/notifications`
+- **Görev:** Kullanıcıya gönderilmiş genel veya kişisel bildirimleri liste halinde gösteren servis entegrasyonu.
+- **İşlevler:**
+  - Sayfa yüklendiğinde kullanıcıya ait bildirimleri API'den çekme
+  - Gelen veriyi parse edip okunmamış olanları özel bir mavi nokta ile işaretleyerek listeleme
+  - Socket.io `newNotification` eventi üzerinden gerçek zamanlı olarak listeyi güncelleme
+- **Teknik Detaylar:**
+  - Authentication header ekleme (Bearer Token)
+  - Socket.io event listener yönetimi ve cleanup işlemleri
+  - State optimizasyonu ve listeleme
+  - Backend tarafında Redis önbellekleme kullanılarak hızlı yanıt alınması
 
-**Response Davranışı:**
-- `202 Accepted` → `{ _id, analysisText, createdAt }` 
-- Report ID, SecureStore'a kaydedilir (`vquest_ai_report_ids` key)
-- Spam koruması: `cooldownRef` ile 10 saniye cooldown
+## 7. Bildirimi Okundu Olarak İşaretleme Servisi
+- **API Endpoint:** `PUT /api/notifications/{notifId}/read`
+- **Görev:** Kullanıcının gelen yeni bir bildirimi okuduğunu belirtmek amacıyla, bildirim durumunu güncelleyen servis entegrasyonu.
+- **İşlevler:**
+  - Okundu butonuna tıklandığında API'ye PUT isteği gönderme
+  - Başarılı işlem sonucunda mavi bildirim noktasını UI'dan kaldırma
+  - Okunmamış tüm bildirimleri aynı anda okundu olarak işaretleyebilme
+- **Teknik Detaylar:**
+  - Path parametresi kullanımı
+  - Optimistic UI update
+  - Çoklu güncellemeler için `Promise.all` kullanımı
+  - Authentication header ekleme
 
----
-
-## 2. Analiz Sonucu Görüntüleme
-
-**Endpoint:** `GET /api/ai/reports/:reportId`  
-**Sorumlu Ekran:** `AnalysisScreen.jsx`  
-**Authentication:** Bearer Token gerekli  
-
-**Mobil Uygulama:**
-```js
-// SecureStore'daki ID listesinden her raporu tek tek fetch eder
-const { data } = await api.get(`/ai/reports/${id}`);
-```
-
-**Response Davranışı:**
-- `200 OK` → `{ _id, analysisText, createdAt }`
-- Modal içinde scrollable text olarak gösterilir
-
----
-
-## 3. Eski Analizleri Silme
-
-**Endpoint:** `DELETE /api/ai/reports/:reportId`  
-**Sorumlu Ekran:** `AnalysisScreen.jsx`  
-**Authentication:** Bearer Token gerekli  
-
-**Mobil Uygulama:**
-```js
-await api.delete(`/ai/reports/${id}`);
-// SecureStore'dan da ID kaldırılır
-await saveIds(saved.filter(x => x !== id));
-setReports(prev => prev.filter(r => r._id !== id));
-```
-
-**Response Davranışı:**
-- `204 No Content` → Confirm dialog sonrası UI'dan animasyonlu kaldırma
-- "Tümünü Sil" butonu tüm raporları toplu siler
-
----
-
-## 4. Yapay Zeka Komutu Güncelleme (Admin)
-
-**Endpoint:** `PUT /api/admin/ai/prompt`  
-**Sorumlu Ekran:** `AdminDashboardScreen.jsx`  
-**Authentication:** Bearer Token (Admin yetkisi gerekli)  
-
-**Mobil Uygulama:**
-```js
-// Önce mevcut prompt GET ile alınır (ekstra endpoint)
-const { data } = await api.get('/admin/ai/prompt');
-setAiPromptText(data.promptText || '');
-
-// Ardından güncelleme yapılır
-await api.put('/admin/ai/prompt', { promptText: aiPromptText.trim() });
-```
-
-**Validasyon:**
-- Boş prompt gönderilmesi engellenir (`trim()` kontrolü)
-- Güncelleme sırasında buton "Yükleniyor..." state'ine geçer
-
----
-
-## 5. Küresel Bildirim Gönderme (Admin)
-
-**Endpoint:** `POST /api/admin/notifications`  
-**Sorumlu Ekran:** `AdminDashboardScreen.jsx`  
-**Authentication:** Bearer Token (Admin yetkisi gerekli)  
-
-**Mobil Uygulama:**
-```js
-await api.post('/admin/notifications', { message: notifMessage });
-```
-
-**Response Davranışı:**
-- `201 Created` → Alert ile başarı bildirimi
-- Backend Socket.io ile anlık yayın yapar, tüm aktif kullanıcılara iletilir
-
----
-
-## 6. Gelen Bildirimleri Görüntüleme
-
-**Endpoint:** `GET /api/notifications`  
-**Sorumlu Ekran:** `NotificationsScreen.jsx`  
-**Authentication:** Bearer Token gerekli  
-
-**Mobil Uygulama:**
-```js
-const { data } = await api.get('/notifications');
-setNotifications(Array.isArray(data) ? data : []);
-```
-
-**Ek Özellik:**
-- Socket.io `newNotification` eventi ile gerçek zamanlı yeni bildirim ekleme
-- Okunmamışlar mavi nokta ile işaretlenir
-- Boş durum: "Burası şimdilik sessiz" empty state
-
----
-
-## 7. Bildirimi Okundu Olarak İşaretleme
-
-**Endpoint:** `PUT /api/notifications/:notifId/read`  
-**Sorumlu Ekran:** `NotificationsScreen.jsx`  
-**Authentication:** Bearer Token gerekli  
-
-**Mobil Uygulama:**
-```js
-// Tekil okundu işaretleme
-await api.put(`/notifications/${id}/read`);
-setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
-
-// Tümünü okundu işaretleme
-await Promise.all(unread.map(n => api.put(`/notifications/${n._id}/read`)));
-```
-
-**Response Davranışı:**
-- `200 OK` → Optimistic UI güncelleme (mavi nokta kalkar)
-
----
-
-## 8. Bildirim Silme
-
-**Endpoint:** `DELETE /api/notifications/:notifId`  
-**Sorumlu Ekran:** `NotificationsScreen.jsx`  
-**Authentication:** Bearer Token gerekli  
-
-**Mobil Uygulama:**
-```js
-await api.delete(`/notifications/${id}`);
-// LayoutAnimation ile fade-out animasyonu
-LayoutAnimation.configureNext(LayoutAnimation.create(300, ...));
-setNotifications(prev => prev.filter(n => n._id !== id));
-```
-
-**Response Davranışı:**
-- `204 No Content` → Confirm dialog → LayoutAnimation fade-out → listeden kaldırma
-
----
-
-## Genel Prensiplere Uyum
-
-| Prensip | Durum |
-|--------|-------|
-| HTTP Client (Axios + Interceptor) | ✅ `api.js` — 30s timeout, JWT auto-inject |
-| Authentication (SecureStore) | ✅ Token otomatik ekleniyor |
-| 401 Error Handling | ✅ Login'e yönlendirme |
-| 429 Rate Limit | ✅ Alert ile kullanıcıya uyarı |
-| Loading States | ✅ ActivityIndicator her istekte |
-| Error Handling | ✅ Alert.alert ile kullanıcı dostu mesaj |
-| Caching (Redis) | ✅ Backend tarafında — DELETE'te cache temizleme |
+## 8. Bildirim Silme Servisi
+- **API Endpoint:** `DELETE /api/notifications/{notifId}`
+- **Görev:** Kullanıcının artık görmek istemediği veya eski bildirimleri kendi listesinden kalıcı olarak silmesini sağlayan servis entegrasyonu.
+- **İşlevler:**
+  - Silme işlemi öncesinde onay (confirmation) dialog'u gösterme
+  - API'ye DELETE isteği gönderme
+  - Silinen bildirimi listeden yumuşak bir fade-out animasyonu ile çıkarma
+- **Teknik Detaylar:**
+  - Path parametresi kullanımı
+  - LayoutAnimation API entegrasyonu (Animasyonlu UI)
+  - Error handling ve kullanıcı bildirimi
+  - Authentication header ekleme
