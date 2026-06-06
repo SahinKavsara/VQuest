@@ -1,139 +1,87 @@
 # Mustafa İsmail Toptaş'ın Mobil Frontend Görevleri
-
-**Modül:** Yapay Zeka (AI) Analiz + Sistem Bildirimleri + Admin Paneli  
-**Ekran Dosyaları:**
-- `mobile/src/screens/main/AnalysisScreen.jsx`
-- `mobile/src/screens/main/NotificationsScreen.jsx`  
-- `mobile/src/screens/admin/AdminDashboardScreen.jsx` (Bildirim + AI Prompt bölümleri)
-
----
+**Mobile Front-end Demo Videosu:** [Link buraya eklenecek](https://example.com)
 
 ## 1. Kullanıcı AI Performans Analizi Ekranı
-
-**Bağlı API:** `POST /api/ai/analysis` | `GET /api/ai/reports/{reportId}` | `DELETE /api/ai/reports/{reportId}`  
-**Dosya:** `AnalysisScreen.jsx`
-
-### UI Bileşenleri
-- **"✨ Analiz Başlat"** butonu — gradient/solid tasarım, disabled state ile spam koruması
-- **"Yapay Zeka Düşünüyor..."** — ActivityIndicator + metin ile loading durumu
-- **İstatistik Kartları** — Toplam analiz sayısı, Güçlü Yönler, Gelişim alanları
-- **Rapor Listesi (FlatList)** — Her rapor: tarih, kısa özet, detay (👁️) ve sil (🗑️) butonları
-- **Detay Modal** — ScrollView içinde tam analiz metni
-- **"Tümünü Sil"** header butonu
-- **Empty State** — "🤖 Henüz Analiz Yok" + açıklama metni
-
-### Kullanıcı Deneyimi (UX)
-- **Spam Koruması:** `cooldownRef` ile 10 saniye bekleme süresi
-- **Anlık feedback:** Buton disabled + loading spinner
-- **Confirm Dialog:** Silme öncesi onay
-- **Hata durumu:** Alert.alert ile kullanıcı dostu mesaj
-
-### Teknik Detaylar
-- `useState`, `useEffect`, `useRef` hook'ları
-- `SecureStore` ile report ID'leri local cihazda saklanır
-- Raporlar `Promise.all` ile paralel fetch edilir
-
----
+- **API Endpoints:** `POST /api/ai/analysis`, `GET /api/ai/reports/{reportId}`, `DELETE /api/ai/reports/{reportId}`
+- **Görev:** Kullanıcının oyun performansına dayalı yapay zeka analiz raporlarını oluşturmasını, görüntülemesini ve silebilmesini sağlayan mobil ekran tasarımı ve implementasyonu (AnalysisScreen.jsx).
+- **UI Bileşenleri:**
+  - "✨ Analiz Başlat" butonu (gradient/solid tasarım, loading state destekli)
+  - "Yapay Zeka Düşünüyor..." yükleme (ActivityIndicator) durumu
+  - İstatistik Kartları (Toplam analiz sayısı, Güçlü Yönler, Gelişim alanları)
+  - Rapor Listesi (FlatList ile tarih, kısa özet, detay 👁️ ve sil 🗑️ butonları)
+  - Detay Modal (ScrollView içinde tam analiz metni gösterimi)
+  - "Tümünü Sil" header butonu
+  - Empty State ("🤖 Henüz Analiz Yok" mesajı ve yönlendirme)
+- **Form Validasyonu (Mantık Kontrolleri):**
+  - Butona arka arkaya tıklamayı engellemek için cooldown takibi (10 saniye bekleme)
+  - İstek atılırken butonun disabled state'e geçirilmesi
+- **Kullanıcı Deneyimi:**
+  - Spam koruması anında görsel geribildirim (disabled buton)
+  - Rapor silme işleminden önce onay (Confirm Dialog) gösterilmesi
+  - Hata durumunda kullanıcı dostu Alert mesajları verilmesi
+  - Optimistic update ile silinen öğelerin anında arayüzden kaybolması
+- **Teknik Detaylar:**
+  - Hooks (`useState`, `useEffect`, `useRef`) ve state yönetimi
+  - Local caching (SecureStore ile rapor ID'lerini yerel cihazda saklama)
+  - Birden fazla API isteğini `Promise.all` ile paralel işleme
+  - Platform bağımsız SafeAreaView ve StatusBar kullanımı
 
 ## 2. Kullanıcı Bildirimler Ekranı
+- **API Endpoints:** `GET /api/notifications`, `PUT /api/notifications/{notifId}/read`, `DELETE /api/notifications/{notifId}`
+- **Görev:** Kullanıcının sistemsel duyuruları veya kişisel bildirimleri görebileceği, okundu olarak işaretleyip silebileceği mobil ekran tasarımı ve implementasyonu (NotificationsScreen.jsx).
+- **UI Bileşenleri:**
+  - Bildirim Listesi (FlatList ile kart bazlı listeleme: mesaj, tarih, okundu bilgisi)
+  - Okunmamış Badge (Mavi nokta - `unreadDot` ile görsel işaretleme)
+  - "✓ Tümünü Okundu" header butonu (yalnızca okunmamış bildirim varsa görünür)
+  - Okundu butonu (✓) (yalnızca okunmamış bildirimlerde görünür)
+  - Sil butonu (✕) (her bildirim satırında)
+  - Empty State ("🔕 Burası şimdilik sessiz" mesajı)
+- **Form Validasyonu (Mantık Kontrolleri):**
+  - Sadece okunmamış bildirimi olan durumlarda çoklu okundu işlemine izin verilmesi
+- **Kullanıcı Deneyimi:**
+  - Socket.io entegrasyonu ile gerçek zamanlı (real-time) anlık bildirim düşmesi
+  - Bildirim silme işlemlerinde LayoutAnimation (300ms) ile yumuşak fade-out/slide animasyonu
+  - Okundu işaretlemesinde anında UI tepkisi (Optimistic Update)
+  - İlk yükleme esnasında Skeleton/ActivityIndicator loading durumu
+- **Teknik Detaylar:**
+  - `LayoutAnimation` API entegrasyonu ve Android için `UIManager` flag'inin aktifleştirilmesi
+  - Socket.io event listener kaydı ve sayfa kapanışında cleanup işlemleri
+  - Performanslı `Array.filter` kullanımı ile state optimizasyonu
 
-**Bağlı API:** `GET /api/notifications` | `PUT /api/notifications/{notifId}/read` | `DELETE /api/notifications/{notifId}`  
-**Dosya:** `NotificationsScreen.jsx`
+## 3. Admin Bildirim Gönderme Paneli
+- **API Endpoint:** `POST /api/admin/notifications`
+- **Görev:** Sistem yöneticilerinin kullanıcılara hızlıca genel bildirim göndermesini sağlayan Bottom Sheet Modal tasarımı ve entegrasyonu (AdminDashboardScreen.jsx).
+- **UI Bileşenleri:**
+  - Admin Dashboard'da "🔔 Bildirim Gönder" menü kartı
+  - Animasyonlu Bottom Sheet Modal ekranı
+  - Çok satırlı TextArea girişi (height: 100)
+  - "Gönder" butonu (ActivityIndicator yükleme durumu ile)
+- **Form Validasyonu:**
+  - Boş mesaj (yalnızca boşluk) engellemesi (`trim()` kontrolü)
+- **Kullanıcı Deneyimi:**
+  - Gönderim esnasında kullanıcının başka butona basmasını engellemek için buton kilitlenmesi (disabled)
+  - Başarı veya hata durumunda net Alert geri bildirimleri
+  - Modal kapandığında önceki girilmiş hatalı/yarım form metninin sıfırlanması (temizlenmesi)
+- **Teknik Detaylar:**
+  - Modal içinde ScrollView kullanımı ve Keyboard dismiss/avoid işlemleri
+  - State üzerinden form input yönetimi (notifMessage state)
+  - Hızlı UI tepkisi için action loading state yönetimi
 
-### UI Bileşenleri
-- **Bildirim Listesi (FlatList)** — Her kart: mesaj, tarih, okundu/okunmadı durumu
-- **Okunmamış Badge** — Mavi nokta (`unreadDot`) ile görsel işaret
-- **"✓ Tümünü Okundu"** header butonu (sadece okunmamış varsa görünür)
-- **Okundu butonu (✓)** — Yeşil, sadece okunmamış bildirimlerde görünür
-- **Sil butonu (✕)** — Her bildirim satırında
-- **Empty State** — "🔕 Burası şimdilik sessiz" + açıklama
-
-### Kullanıcı Deneyimi (UX)
-- **Gerçek Zamanlı:** Socket.io `newNotification` eventi ile anlık bildirim ekleme
-- **Fade-out Animasyonu:** `LayoutAnimation.create(300ms)` ile silme animasyonu ✅ (MD gereksinimi)
-- **Optimistic Update:** Okundu işaretleme anında UI'da yansıtılır
-- **Loading:** İlk yüklemede `ActivityIndicator`
-
-### Teknik Detaylar
-- `LayoutAnimation` + `UIManager.setLayoutAnimationEnabledExperimental(true)` (Android)
-- Socket.io event listener temizleme (cleanup)
-- `Array.filter` ile state optimizasyonu
-
----
-
-## 3. Admin — Bildirim Gönderme Paneli
-
-**Bağlı API:** `POST /api/admin/notifications`  
-**Dosya:** `AdminDashboardScreen.jsx` (Modal bileşeni)
-
-### UI Bileşenleri
-- **Admin Menü Öğesi** — "🔔 Bildirim Gönder" menü kartı
-- **Bottom Sheet Modal** — Animasyonlu slide-up
-- **TextArea** — Çok satırlı mesaj girişi (height: 100)
-- **"Gönder" butonu** — Loading state ile
-
-### Kullanıcı Deneyimi (UX)
-- Boş mesaj validasyonu (`trim()` kontrolü)
-- Gönderim sırasında `ActivityIndicator` + disabled buton
-- Başarı/hata Alert bildirimi
-- Modal kapandığında form temizlenir
-
----
-
-## 4. Admin — Yapay Zeka Promptu Düzenleme Paneli
-
-**Bağlı API:** `GET /api/admin/ai/prompt` | `PUT /api/admin/ai/prompt`  
-**Dosya:** `AdminDashboardScreen.jsx` (Modal bileşeni)
-
-### UI Bileşenleri
-- **Admin Menü Öğesi** — "🤖 Yapay Zeka Komutu" menü kartı
-- **Bottom Sheet Modal** — Animasyonlu slide-up
-- **Loading State** — Modal açılırken mevcut prompt fetch edilir
-- **TextArea (full-width)** — height: 180, mevcut prompt ile önceden dolu gelir
-- **"Kaydet" butonu** — Güncelleme sırasında loading state
-
-### Kullanıcı Deneyimi (UX)
-- Boş prompt gönderilmesi engellenir
-- Kaydetme sırasında buton kilitlenir (optimistic feedback)
-- Yükleniyor placeholder: "Prompt yükleniyor..."
-- Başarı Alert: "✅ Başarılı — Yapay zeka promptu güncellendi"
-
----
-
-## Tasarım Sistemi
-
-### Renk Paleti
-```js
-const C = {
-  bg: '#1a1a2e',       // Arka plan
-  card: '#16213e',     // Kart arka planı
-  cardAlt: '#0f1630',  // Alternatif kart
-  primary: '#e94560',  // Ana renk (kırmızı)
-  accent: '#00e5ff',   // Vurgu rengi (cyan)
-  border: '#0f3460',   // Kenarlık
-  text: '#e8eaf6',     // Metin
-  muted: '#888',       // Soluk metin
-  success: '#22c55e',  // Başarı yeşili
-  purple: '#6c47ff',   // AI butonu rengi
-};
-```
-
-### Navigasyon
-- **Analysis Ekranı** → Alt tab navigasyonu (`🤖 Analiz` tab)
-- **Notifications Ekranı** → Alt tab navigasyonu (`🔔 Bildirim` tab)
-- **Admin Modalleri** → Admin Dashboard üzerinden açılır
-
-### Genel Prensiplere Uyum
-
-| Prensip | Durum |
-|--------|-------|
-| Loading States (Skeleton/Spinner) | ✅ ActivityIndicator her işlemde |
-| Empty States | ✅ Her iki ekranda da |
-| Error Handling (Alert) | ✅ Kullanıcı dostu mesajlar |
-| Feedback (Toast/Alert) | ✅ Her işlem sonrası |
-| Safe Area desteği | ✅ SafeAreaView kullanılıyor |
-| StatusBar | ✅ light-content, bg rengi ile |
-| Responsive FlatList | ✅ contentContainerStyle ile |
-| Animasyon (MD gereksinimi) | ✅ LayoutAnimation fade-out |
-| Socket.io entegrasyonu | ✅ Gerçek zamanlı bildirimler |
-| Form Validasyon | ✅ Boş input kontrolü |
+## 4. Admin Yapay Zeka Promptu Düzenleme Paneli
+- **API Endpoints:** `GET /api/admin/ai/prompt`, `PUT /api/admin/ai/prompt`
+- **Görev:** Sistem yöneticilerinin, analiz oluştururken kullanılacak AI davranışını (prompt) dinamik olarak değiştirmesini sağlayan modal tasarımı (AdminDashboardScreen.jsx).
+- **UI Bileşenleri:**
+  - Admin Dashboard'da "🤖 Yapay Zeka Komutu" menü kartı
+  - Animasyonlu Bottom Sheet Modal ekranı
+  - Modal açılırken verinin yüklendiğini belirten Loading State metni/ikonu
+  - Tam genişlikte (full-width) TextArea (height: 180, mevcut veriyi içeren)
+  - "Kaydet" butonu
+- **Form Validasyonu:**
+  - Prompt alanının tamamen boş bırakılarak veya sadece boşluk atılarak gönderilmesinin engellenmesi
+- **Kullanıcı Deneyimi:**
+  - Ekran açılırken mevcut güncel verinin otomatik gelmesi (loading placeholder sonrası)
+  - Kaydetme esnasında Optimistic Feedback ile butonun bekliyor durumuna geçmesi
+  - İşlem başarıyla bitince "✅ Başarılı — Yapay zeka promptu güncellendi" Alert bildirimi
+- **Teknik Detaylar:**
+  - Sayfa mount edildiğinde (Modal açıldığında) hızlı asenkron API GET çağrısı
+  - Component içinde iki yönlü state kontrolü (fetching state ve updating state ayrımı)
