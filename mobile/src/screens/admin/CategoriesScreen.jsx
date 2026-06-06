@@ -70,7 +70,11 @@ export default function CategoriesScreen({ navigation }) {
         ...c,
         _id: c._id || c.mongoId || c.id,
       }));
-      setCategories(normalized);
+      // Sunucudan gelen duplicate _id'leri temizle
+      const unique = Array.from(
+        new Map(normalized.map((c) => [c._id, c])).values()
+      );
+      setCategories(unique);
     } catch (error) {
       console.error('[CategoriesScreen] fetch hatası:', error.message);
       Alert.alert('Hata', 'Kategoriler alınamadı.');
@@ -107,7 +111,10 @@ export default function CategoriesScreen({ navigation }) {
         'Kategori eklenirken hata oluştu.'
       );
       const added = { ...data, _id: data._id || data.mongoId || data.id };
-      setCategories((prev) => [...prev, added]);
+      // Zaten listede aynı _id varsa ekleme (optimistic duplicate guard)
+      setCategories((prev) =>
+        prev.some((c) => c._id === added._id) ? prev : [...prev, added]
+      );
       setNewCatName('');
     } catch (error) {
       console.error('[CategoriesScreen] ekleme hatası:', error.message);
@@ -155,17 +162,52 @@ export default function CategoriesScreen({ navigation }) {
     }
   };
 
+  const handleDeleteCategory = (cat) => {
+    Alert.alert(
+      'Kategoriyi Sil',
+      `"${cat.name}" kategorisini silmek istediğine emin misin?`,
+      [
+        { text: 'İptal', style: 'cancel' },
+        {
+          text: 'Sil',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await handlePromiseToast(
+                api.delete(`/admin/categories/${cat._id}`),
+                'Kategori siliniyor... ⏳',
+                'Kategori başarıyla silindi! 🗑️',
+                'Kategori silinemedi.'
+              );
+              setCategories((prev) => prev.filter((c) => c._id !== cat._id));
+            } catch (error) {
+              console.error('[CategoriesScreen] silme hatası:', error.message);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const renderCategory = ({ item }) => (
     <View style={styles.catCard}>
       <View style={{ flex: 1 }}>
         <Text style={styles.catName}>🏷️ {item.name}</Text>
       </View>
-      <TouchableOpacity
-        style={styles.editBtn}
-        onPress={() => handleOpenEditModal(item)}
-      >
-        <Text style={styles.editBtnText}>Düzenle</Text>
-      </TouchableOpacity>
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        <TouchableOpacity
+          style={styles.editBtn}
+          onPress={() => handleOpenEditModal(item)}
+        >
+          <Text style={styles.editBtnText}>Düzenle</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.deleteBtn}
+          onPress={() => handleDeleteCategory(item)}
+        >
+          <Text style={styles.deleteBtnText}>Sil</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -334,6 +376,8 @@ const styles = StyleSheet.create({
   catName: { fontSize: 15, fontWeight: '700', color: C.text },
   editBtn: { backgroundColor: 'rgba(0,229,255,0.15)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
   editBtnText: { color: C.accent, fontSize: 12, fontWeight: '700' },
+  deleteBtn: { backgroundColor: 'rgba(239,68,68,0.15)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  deleteBtnText: { color: C.danger, fontSize: 12, fontWeight: '700' },
 
   emptyState: { alignItems: 'center', paddingTop: 80 },
   emptyIcon: { fontSize: 56, marginBottom: 16 },
