@@ -84,8 +84,9 @@ export default function AnalysisScreen() {
       setReports(prev => [data, ...prev]);
       setSelectedReport(data);
       Alert.alert('✅', 'Analiz tamamlandı!');
-    } catch {
-      Alert.alert('Hata', 'Analiz yapılamadı.');
+    } catch (err) {
+      console.error("Analysis Error:", err.response ? err.response.data : err.message);
+      Alert.alert('Hata', `Analiz yapılamadı: ${err.response?.data?.message || err.message}`);
     } finally {
       setLoading(false);
       setTimeout(() => { cooldownRef.current = false; }, 10000);
