@@ -107,24 +107,7 @@
   - Socket.io: Her doğru cevap sonrası `leaderboard:update` eventi oda üyelerine yayılır (REST polling yerine tercih edilir)
   - Hata durumları: `401 Unauthorized`, `404 Not Found` (oda veya leaderboard bulunamadı)
 
-## 7. Odadan Katılımcı Çıkarma Servisi
-- **API Endpoint:** `DELETE /api/rooms/:roomId/participants/:userId`
-- **Auth:** Bearer Token (yalnızca oda kurucusu/host)
-- **Görev:** Kurallara uymayan bir katılımcının oda kurucusu tarafından odadan çıkarılması (Kick) işlemi.
-- **İşlevler:**
-  - Hedef kullanıcının `userId` değeri ile istek gönderme
-  - Yalnızca oda kurucusunun bu yetkiye sahip olduğunu doğrulama
-  - İlgili katılımcıyı `participants` tablosundan çıkarma
-  - Çıkarılan kullanıcıya Socket.io üzerinden `room:kicked` bildirimi gönderme
-  - Odadaki diğer katılımcılara güncel katılımcı listesini yayma
-- **Teknik Detaylar:**
-  - Bearer Token ile kimlik doğrulama; `userId === room.hostId` yetki kontrolü
-  - Path parametreleri: `roomId`, `userId`
-  - Veritabanı: `participants` tablosundan ilgili satır silinir; `currentCount` güncellenir
-  - Socket.io: Hedef kullanıcıya `room:kicked` eventi; tüm oda üyelerine `participant:left` eventi gönderilir
-  - Hata durumları: `401 Unauthorized`, `403 Forbidden` (yetkisiz host), `404 Not Found` (kullanıcı/oda bulunamadı)
-
-## 8. Oda Kapatma/Silme Servisi
+## 7. Oda Kapatma/Silme Servisi
 - **API Endpoint:** `DELETE /api/rooms/:roomId`
 - **Auth:** Bearer Token (yalnızca oda kurucusu/host veya sistem)
 - **Görev:** Süresi dolan veya oda kurucusu tarafından sonlandırılan canlı odanın kapatılıp erişime kapatılması.

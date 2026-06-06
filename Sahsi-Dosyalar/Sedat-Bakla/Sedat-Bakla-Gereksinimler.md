@@ -29,12 +29,7 @@
 * **API Metodu:** GET
 * **Açıklama:** Yarışmadaki anlık skorların ve başarı sıralamalarının listelenmesi.
 
-7. Odadan Katılımcı Çıkarma
-
-* **API Metodu:** DELETE
-* **Açıklama:** Kurallara uymayan bir katılımcının odadan atılması (Kick).
-
-8. Oda Kapatma/Silme
+7. Oda Kapatma/Silme
 
 * **API Metodu:** DELETE
 * **Açıklama:** Süresi dolan canlı odanın sonlandırılıp erişime kapatılması.
