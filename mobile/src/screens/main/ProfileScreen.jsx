@@ -149,7 +149,7 @@ export default function ProfileScreen() {
           onPress: async () => {
             try {
               await api.delete('/profile');
-              logout();
+              await logout();
             } catch (err) {
               Alert.alert('Hata', err.response?.data?.message || 'Hesap silinemedi.');
             }
