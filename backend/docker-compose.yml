@@ -10,11 +10,15 @@ services:
       - MONGO_URI=mongodb://mongo:27017/vquest
       - JWT_SECRET=vquest_super_secret_key_12345!@#
       - NODE_ENV=development
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - REDIS_URL=redis://redis:6379
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
       - mongo
+      - rabbitmq
+      - redis
 
   mongo:
     image: mongo:latest
@@ -24,6 +28,24 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: vquest-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"    # AMQP (uygulama bağlantısı)
+      - "15672:15672"  # Yönetim paneli
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+
+  redis:
+    image: redis:7-alpine
+    container_name: vquest-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
 
 volumes:
   mongo-data:
