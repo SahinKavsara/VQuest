@@ -10,7 +10,7 @@ Bu dokümanda, mobil uygulamanın REST API ile iletişimini sağlayan backend en
 
 1. [Şahin Kavsara'nın Mobil Backend Görevleri](../Sahsi-Dosyalar/Sahin-Kavsara/Sahin-Kavsara-Mobil-Backend-Görevleri.md)
 2. [Mustafa İsmail Toptaş'ın Mobil Backend Görevleri](../Sahsi-Dosyalar/Mustafa-%C4%B0smail-Topta%C5%9F/Mustafa-%C4%B0smail-Topta%C5%9F-Mobil-Backend-Gorevleri.md)
-3. [Ömer Said Karakuş'un Mobil Backend Görevleri](../Sahsi-Dosyalar/Ömer-Said-Karakus/Ömer-Said-Karakus-Mobil-Backend-Görevleri.md)
+3. [Ömer Said Karakuş'un Mobil Backend Görevleri](../Sahsi-Dosyalar/Ömer-Said-Karakus/Ömer-Said-Karakuş-Mobil-Backend-Görevleri.md)
 4. [Emir Omrak'ın Mobil Backend Görevleri](../Sahsi-Dosyalar/Emir-Omrak/Emir-Omrak-Mobil-Backend-Görevleri.md)
 5. [Sedat Bakla'nın Mobil Backend Görevleri](../Sahsi-Dosyalar/Sedat-Bakla/Sedat-Bakla-Mobil-Backend-Gorevleri.md)
 

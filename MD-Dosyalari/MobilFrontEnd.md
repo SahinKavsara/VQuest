@@ -8,7 +8,7 @@ Bu dokümanda, mobil uygulamanın kullanıcı arayüzü (UI) ve kullanıcı dene
 
 1. [Şahin Kavsara'nın Mobil Frontend Görevleri](../Sahsi-Dosyalar/Sahin-Kavsara/Sahin-Kavsara-Mobil-Frontend-Görevleri.md)
 2. [Mustafa İsmail Toptaş'ın Mobil Frontend Görevleri](../Sahsi-Dosyalar/Mustafa-%C4%B0smail-Topta%C5%9F/Mustafa-%C4%B0smail-Topta%C5%9F-Mobil-Frontend-Gorevleri.md)
-3. [Ömer Said Karakuş'un Mobil Frontend Görevleri](../Sahsi-Dosyalar/Ömer-Said-Karakus/Ömer-Said-Karakus-Mobil-Frontend-Görevleri.md)
+3. [Ömer Said Karakuş'un Mobil Frontend Görevleri](../Sahsi-Dosyalar/Ömer-Said-Karakus/Ömer-Said-Karakuş-Mobil-Frontend-Görevleri.md)
 4. [Emir Omrak'ın Mobil Frontend Görevleri](../Sahsi-Dosyalar/Emir-Omrak/Emir-Omrak-Mobil-Frontend-Görevleri.md)
 5. [Sedat Bakla'nın Mobil Frontend Görevleri](../Sahsi-Dosyalar/Sedat-Bakla/Sedat-Bakla-Mobil-Frontend-Gorevleri.md)
 
