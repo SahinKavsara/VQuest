@@ -2,9 +2,6 @@
 
 ---
 
-## Proje Hakkında
-TEST KOMUTU = echo -e "\n\n🚀 1. Ömer'in Testleri Başlıyor..." && (cd backend && node omer_test.js) ; sleep 0.5 ; echo -e "\n\n🚀 2. Sedat'ın Testleri Başlıyor..." && (cd backend && node Sedat_Bakla_Test.js) ; sleep 0.5 ; echo -e "\n\n🚀 3. Emir'in Testleri Başlıyor..." && node Sahsi-Dosyalar/Emir-Omrak/Emir-Omrak-Test.js ; sleep 0.5 ; echo -e "\n\n🚀 4. Şahin'in Testleri Başlıyor..." && node Sahsi-Dosyalar/Sahin-Kavsara/Sahin-Kavsara-Test.js ; sleep 0.5 ; echo -e "\n\n🚀 5. Mustafa'nın Testleri Başlıyor..." && node Sahsi-Dosyalar/Mustafa-İsmail-Toptaş/Mustafa-Ismail-Toptas-Test.js
-
 
 ![Ürün Tanıtım Görseli](Product.png)
 
