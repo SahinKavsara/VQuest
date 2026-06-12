@@ -8,11 +8,11 @@ Bu dokümanda, mobil uygulamanın REST API ile iletişimini sağlayan backend en
 
 ## Grup Üyelerinin Mobil Backend Görevleri
 
-1. [Şahin Kavsara'nın Mobil Backend Görevleri](../Sahsi-Dosyalar/Sahin-Kavsara/Sahin-Kavsara-Mobil-Backend-Görevleri.md)
-2. [Mustafa İsmail Toptaş'ın Mobil Backend Görevleri](../Sahsi-Dosyalar/Mustafa-%C4%B0smail-Topta%C5%9F/Mustafa-%C4%B0smail-Topta%C5%9F-Mobil-Backend-Gorevleri.md)
-3. [Ömer Said Karakuş'un Mobil Backend Görevleri](../Sahsi-Dosyalar/Ömer-Said-Karakus/Ömer-Said-Karakuş-Mobil-Backend-Görevleri.md)
-4. [Emir Omrak'ın Mobil Backend Görevleri](../Sahsi-Dosyalar/Emir-Omrak/Emir-Omrak-Mobil-Backend-Görevleri.md)
-5. [Sedat Bakla'nın Mobil Backend Görevleri](../Sahsi-Dosyalar/Sedat-Bakla/Sedat-Bakla-Mobil-Backend-Gorevleri.md)
+1. [Şahin Kavsara'nın Mobil Backend Görevleri](team/sahin-kavsara/Sahin-Kavsara-Mobil-Backend-Görevleri.md)
+2. [Mustafa İsmail Toptaş'ın Mobil Backend Görevleri](team/mustafa-ismail-toptas/Mustafa-İsmail-Toptaş-Mobil-Backend-Gorevleri.md)
+3. [Ömer Said Karakuş'un Mobil Backend Görevleri](team/omer-said-karakus/Ömer-Said-Karakuş-Mobil-Backend-Görevleri.md)
+4. [Emir Omrak'ın Mobil Backend Görevleri](team/emir-omrak/Emir-Omrak-Mobil-Backend-Görevleri.md)
+5. [Sedat Bakla'nın Mobil Backend Görevleri](team/sedat-bakla/Sedat-Bakla-Mobil-Backend-Gorevleri.md)
 
 ---
 

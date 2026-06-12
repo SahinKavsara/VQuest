@@ -1,6 +1,6 @@
 # API Tasarımı - OpenAPI Specification
 
-**OpenAPI Spesifikasyon Dosyası:** [VQuestAPI.yaml](../VQuestAPI.yaml)
+**OpenAPI Spesifikasyon Dosyası:** [openapi.yaml](api/openapi.yaml)
 
 Bu doküman, OpenAPI Specification (OAS) 3.0 standardına göre hazırlanmış VQuest Gerçek Zamanlı ve Yapay Zeka Destekli Bilgi Yarışması Platformu API tasarımını içermektedir. Gereksinim analizi aşamasında belirlenen tüm dağılımlar ve ekip üyesi sorumlulukları bu tasarıma entegre edilmiştir.
 

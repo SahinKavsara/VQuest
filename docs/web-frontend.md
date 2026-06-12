@@ -8,11 +8,11 @@ Bu dokümanda, VQuest projesinin kullanıcı arayüzü (UI) ve kullanıcı deney
 
 ## Grup Üyelerinin Web Frontend Görevleri
 
-1. [Şahin Kavsara'nın Web Frontend Görevleri](../Sahsi-Dosyalar/Sahin-Kavsara/Sahin-Kavsara-Web-Frontend-Gorevleri.md)
-2. [Mustafa İsmail Toptaş'ın Web Frontend Görevleri](../Sahsi-Dosyalar/Mustafa-İsmail-Toptaş/Mustafa-İsmail-Toptaş-Web-Frontend-Gorevleri.md)
-3. [Ömer Said Karakuş'un Web Frontend Görevleri](../Sahsi-Dosyalar/Ömer-Said-Karakus/Ömer-Said-Karakus-Web-Frontend-Gorevleri.md)
-4. [Emir Omrak'ın Web Frontend Görevleri](../Sahsi-Dosyalar/Emir-Omrak/Emir-Omrak-Web-Frontend-Gorevleri.md)
-5. [Sedat Bakla'nın Web Frontend Görevleri](../Sahsi-Dosyalar/Sedat-Bakla/Sedat-Bakla-Web-Frontend-Gorevleri.md)
+1. [Şahin Kavsara'nın Web Frontend Görevleri](team/sahin-kavsara/Sahin-Kavsara-Web-Frontend-Gorevleri.md)
+2. [Mustafa İsmail Toptaş'ın Web Frontend Görevleri](team/mustafa-ismail-toptas/Mustafa-İsmail-Toptaş-Web-Frontend-Gorevleri.md)
+3. [Ömer Said Karakuş'un Web Frontend Görevleri](team/omer-said-karakus/Ömer-Said-Karakus-Web-Frontend-Gorevleri.md)
+4. [Emir Omrak'ın Web Frontend Görevleri](team/emir-omrak/Emir-Omrak-Web-Frontend-Gorevleri.md)
+5. [Sedat Bakla'nın Web Frontend Görevleri](team/sedat-bakla/Sedat-Bakla-Web-Frontend-Gorevleri.md)
 
 ---
 
