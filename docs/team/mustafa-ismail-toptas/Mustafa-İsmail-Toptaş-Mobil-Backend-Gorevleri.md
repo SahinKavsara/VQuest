@@ -1,5 +1,5 @@
 # Mustafa İsmail Toptaş'ın Mobil Backend Görevleri
-**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** [Link buraya eklenecek](https://example.com)
+
 
 ## 1. Kişisel Analiz Başlatma Servisi
 - **API Endpoint:** `POST /api/ai/analysis`

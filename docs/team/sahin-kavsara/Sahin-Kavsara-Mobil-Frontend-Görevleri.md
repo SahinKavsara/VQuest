@@ -1,5 +1,4 @@
 # Şahin Kavsara'nın Mobil Frontend Görevleri
-**Mobile Front-end Demo Videosu:** [Link buraya eklenecek](https://example.com)
 
 ## 1. Soru Paketi Oluşturma Ekranı
 - **API Endpoint:** `POST /api/packages`

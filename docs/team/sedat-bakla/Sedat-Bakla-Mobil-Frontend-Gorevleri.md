@@ -1,5 +1,5 @@
 # Sedat Bakla'nın Mobil Frontend Görevleri
-**Mobile Front-end Demo Videosu:** [Link buraya eklenecek](https://example.com)
+
 
 ## 1. Oda Oluşturma Ekranı
 - **API Endpoint:** `POST /api/rooms`

@@ -1,5 +1,4 @@
 # Şahin Kavsara'nın Mobil Backend Görevleri
-**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** [Link buraya eklenecek](https://example.com)
 
 ## 1. Soru Paketi Oluşturma Servisi
 - **API Endpoint:** `POST /api/packages`

@@ -1,5 +1,5 @@
 # Mustafa İsmail Toptaş'ın Mobil Frontend Görevleri
-**Mobile Front-end Demo Videosu:** [Link buraya eklenecek](https://example.com)
+
 
 ## 1. Kişisel Analiz Başlatma Ekranı
 - **API Endpoint:** `POST /api/ai/analysis`

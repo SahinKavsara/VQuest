@@ -1,5 +1,5 @@
 # Sedat Bakla'nın Mobil Backend Görevleri
-**Mobil Front-end ile Back-end Bağlanmış Test Videosu:** [Link buraya eklenecek](https://example.com)
+
 
 ## 1. Oda Oluşturma Servisi
 - **API Endpoint:** `POST /api/rooms`
