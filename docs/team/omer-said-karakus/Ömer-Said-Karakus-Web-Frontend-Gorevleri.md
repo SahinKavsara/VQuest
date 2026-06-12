@@ -1,5 +1,5 @@
 # Ömer Said Karakuş'un Web Frontend Görevleri
-https://youtu.be/UonAgKOUWaw
+
 
 ### 1. Üye Olma (Kayıt) ve Giriş (Login) Ekranları
 **API Endpoint:** `POST /api/auth/register` | `POST /api/auth/login`

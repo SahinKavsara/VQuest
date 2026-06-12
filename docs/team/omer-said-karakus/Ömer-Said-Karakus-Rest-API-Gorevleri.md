@@ -1,5 +1,5 @@
 # Ömer Said Karakuş'un REST API Metotları
-https://www.youtube.com/watch?v=Kkpk1ry7fTE
+
 
 ## Kimlik Doğrulama (Auth) & Profil İşlemleri
 

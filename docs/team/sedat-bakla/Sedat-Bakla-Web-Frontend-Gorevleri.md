@@ -1,5 +1,5 @@
 # Sedat Bakla'nın Web Frontend Görevleri
-https://youtu.be/2ma3TL0oZwo
+
 
 ### 1. Canlı Lobi Ekranı (Oda Bulma/Kurma) Modülü
 **API Endpoint:** `GET /api/rooms` | `POST /api/rooms` | `POST /api/rooms/join-code`

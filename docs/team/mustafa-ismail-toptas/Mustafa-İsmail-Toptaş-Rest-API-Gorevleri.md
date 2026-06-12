@@ -1,6 +1,6 @@
 # Mustafa İsmail Toptaş'ın REST API Metotları
 
-https://www.youtube.com/watch?v=usTNg_cH_GY
+
 
 ## Yapay Zeka (AI) Algoritma ve Analiz Modülü
 

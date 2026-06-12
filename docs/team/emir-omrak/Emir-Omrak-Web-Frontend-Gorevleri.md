@@ -1,5 +1,5 @@
 # Emir Omrak'ın Web Frontend Görevleri
-https://youtu.be/UkqJW-g6XhU
+
 
 ### 1. Ana Soru Havuzu Yönetimi Modülü (Admin Panel)
 **API Endpoint:** `GET /api/questions` | `POST /api/admin/questions` | `PUT /api/admin/questions/{id}` | `DELETE /api/admin/questions/{id}`

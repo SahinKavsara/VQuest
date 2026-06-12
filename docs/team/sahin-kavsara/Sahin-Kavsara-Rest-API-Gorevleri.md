@@ -1,6 +1,6 @@
 # Şahin Kavsara'nın REST API Metotları
 
-API Test Videosu: https://drive.google.com/file/d/1ImDIuVVli9-kYcLQKjN0T3wrLm7B-883/view
+
 
 ## Özel Soru Paketleri (Packages) Yönetimi
 
