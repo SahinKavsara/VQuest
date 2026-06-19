@@ -13,9 +13,8 @@ export default function AdminRooms() {
       const { data } = await api.get('/rooms');
       setRooms(data);
     } catch {
-      setRooms([
-        { _id: '1', name: 'Tarih Şampiyonası', category: 'Tarih', participants: [], maxParticipants: 10, status: 'playing' }
-      ]);
+      setRooms([]);
+      toast.error('Odalar yüklenemedi');
     } finally { setLoading(false); }
   };
 
@@ -31,7 +30,7 @@ export default function AdminRooms() {
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">🚪 Aktif Odalar</h1>
+        <h1 className="page-title">Aktif Odalar</h1>
         <p className="page-subtitle">Sistemdeki yarışma odalarını denetleyin</p>
       </div>
 
